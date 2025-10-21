@@ -34,7 +34,7 @@ export default function Home() {
     }
   };
 
-  // 🔹 Fallback reviews (all 5 stars)
+  // 🔹 Fallback reviews (5-star only)
   const fallbackReviews = [
     {
       author: "Sarah L.",
@@ -56,7 +56,7 @@ export default function Home() {
     },
   ];
 
-  // 🔹 Fetch Google Reviews via serverless API route (5-star filter)
+  // 🔹 Fetch Google Reviews
   useEffect(() => {
     const fetchReviews = async () => {
       try {
@@ -75,7 +75,6 @@ export default function Home() {
         setLoadingReviews(false);
       }
     };
-
     fetchReviews();
   }, []);
 
@@ -104,6 +103,10 @@ export default function Home() {
     },
   ];
 
+  // 🌐 Supabase video URLs
+  const supabaseBase =
+    "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-videos";
+
   return (
     <div className="relative bg-[#0d1117] text-gray-100 overflow-x-hidden">
       {/* 🔹 Background Video */}
@@ -114,7 +117,7 @@ export default function Home() {
         playsInline
         className="fixed inset-0 w-full h-full object-cover brightness-[0.8] contrast-[1.05] z-0"
       >
-        <source src="/videos/hero.mp4" type="video/mp4" />
+        <source src={`${supabaseBase}/hero.mp4`} type="video/mp4" />
       </video>
 
       {/* 🔹 Overlay */}
@@ -202,7 +205,7 @@ export default function Home() {
                 className="w-full h-auto rounded-lg cursor-pointer"
                 onClick={toggleVideo}
               >
-                <source src="/videos/experience.mp4" type="video/mp4" />
+                <source src={`${supabaseBase}/experience.mp4`} type="video/mp4" />
               </video>
               {!isPlaying && (
                 <button
@@ -299,7 +302,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ⭐ CUSTOMER REVIEWS (Only 5-Star) */}
+        {/* ⭐ CUSTOMER REVIEWS */}
         <section className="py-24 px-6 md:px-20 text-center border-t border-[#29C3FF]/30 bg-[#0d1117]/80 backdrop-blur-md">
           <h2 className="text-4xl font-[Playfair_Display] text-white mb-10 drop-shadow-[0_0_25px_rgba(41,195,255,0.5)]">
             5-Star Customer Reviews
@@ -347,6 +350,7 @@ export default function Home() {
     </div>
   );
 }
+
 
 
 
