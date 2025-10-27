@@ -13,6 +13,10 @@ export default function Home() {
   const [reviews, setReviews] = useState<any[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
 
+  // 🌐 Supabase public video base URL
+  const supabaseBase =
+    "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-videos";
+
   // 🔹 Smooth scroll navigation
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
@@ -101,10 +105,6 @@ export default function Home() {
       color: "#3B82F6",
     },
   ];
-
-  // 🌐 Supabase public video URLs
-  const supabaseBase =
-    "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozer-videos";
 
   return (
     <div className="relative bg-[#0d1117] text-gray-100 overflow-x-hidden">
@@ -350,6 +350,7 @@ export default function Home() {
     </div>
   );
 }
+
 
 
 
