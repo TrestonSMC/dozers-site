@@ -7,6 +7,11 @@ import Link from "next/link";
 export default function EventsPage() {
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
 
+  // 🌐 Supabase base URL
+  const supabaseBase =
+    "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-videos";
+
+  // 🎉 Events List
   const events = [
     {
       id: "geeks",
@@ -14,7 +19,7 @@ export default function EventsPage() {
       color: "#8B5CF6",
       desc: "A lively team trivia night where drinks flow and minds race. Bring your crew, battle across themed rounds, and win great bar prizes.",
       time: "Thursdays • 7PM – 10PM",
-      video: "/videos/geeks.mp4",
+      video: `${supabaseBase}/geeks.mp4`,
     },
     {
       id: "tournaments",
@@ -22,7 +27,7 @@ export default function EventsPage() {
       color: "#F59E0B",
       desc: "Compete daily in pool and dart tournaments. Casual or competitive — there’s action for everyone, every day.",
       time: "Every Day • Sign-ups at 6PM",
-      video: "/videos/daily-tournaments.mp4",
+      video: `${supabaseBase}/tournaments.mp4`, // 👈 update to match actual Supabase file name
     },
     {
       id: "karaoke",
@@ -54,6 +59,7 @@ export default function EventsPage() {
     },
   ];
 
+  // 🎬 Handle play/pause per video
   const handlePlay = (id: string) => {
     if (activeVideo && activeVideo !== id) {
       const prev = document.getElementById(activeVideo) as HTMLVideoElement;
@@ -79,7 +85,7 @@ export default function EventsPage() {
       <div className="fixed inset-0 bg-[url('/images/events-bg.jpg')] bg-cover bg-center opacity-30 pointer-events-none" />
       <div className="fixed inset-0 bg-gradient-to-b from-[#0d1117]/70 via-[#0d1117]/80 to-[#0d1117]/95 pointer-events-none" />
 
-      {/* 🔹 Top Navigation */}
+      {/* 🔹 Navigation */}
       <header className="fixed top-0 left-0 w-full flex justify-between items-center px-10 py-6 z-50 backdrop-blur-md bg-[#0d1117]/70 border-b border-[#29C3FF]/20">
         <Link href="/" className="flex items-center gap-3">
           <Image
@@ -99,7 +105,7 @@ export default function EventsPage() {
         </Link>
       </header>
 
-      {/* 🔹 Header Section */}
+      {/* 🔹 Page Header */}
       <section className="relative text-center py-40 z-10">
         <h1 className="text-6xl font-[Playfair_Display] font-bold text-white drop-shadow-[0_0_25px_rgba(139,92,246,0.6)]">
           Events at Dozers Grill
@@ -114,7 +120,7 @@ export default function EventsPage() {
         <div className="flex flex-col gap-12 max-w-6xl mx-auto">
           {events.map((event, i) => {
             const hasVideo = !!event.video;
-            const reverse = i % 2 === 1; // stagger layout
+            const reverse = i % 2 === 1;
 
             return (
               <div
@@ -130,12 +136,15 @@ export default function EventsPage() {
                   boxShadow: `0 0 25px -6px ${event.color}`,
                 }}
               >
-                {/* 🎬 Video */}
+                {/* 🎥 Video Section */}
                 {hasVideo && (
                   <div className="flex-shrink-0 w-full md:w-[280px] aspect-[9/16] overflow-hidden rounded-xl border border-white/10 relative">
                     <video
                       id={event.id}
                       src={event.video}
+                      playsInline
+                      loop
+                      preload="auto"
                       className="w-full h-full object-cover rounded-xl cursor-pointer"
                       onClick={() => handlePlay(event.id)}
                     />
