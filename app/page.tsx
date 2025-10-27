@@ -103,9 +103,9 @@ export default function Home() {
     },
   ];
 
-  // 🌐 Supabase video URLs
+  // 🌐 Supabase video URLs (✅ corrected bucket name)
   const supabaseBase =
-    "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-videos";
+    "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozer-videos";
 
   return (
     <div className="relative bg-[#0d1117] text-gray-100 overflow-x-hidden">
@@ -115,6 +115,7 @@ export default function Home() {
         loop
         muted
         playsInline
+        preload="auto"
         className="fixed inset-0 w-full h-full object-cover brightness-[0.8] contrast-[1.05] z-0"
       >
         <source src={`${supabaseBase}/hero.mp4`} type="video/mp4" />
@@ -132,7 +133,6 @@ export default function Home() {
           height={60}
           className="drop-shadow-[0_0_20px_rgba(41,195,255,0.4)]"
         />
-        {/* Dropdown */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
           className="text-white border border-[#29C3FF]/40 px-4 py-2 rounded-md hover:bg-[#29C3FF]/10 transition"
@@ -202,6 +202,7 @@ export default function Home() {
                 ref={videoRef}
                 loop
                 playsInline
+                preload="auto"
                 className="w-full h-auto rounded-lg cursor-pointer"
                 onClick={toggleVideo}
               >
@@ -350,6 +351,7 @@ export default function Home() {
     </div>
   );
 }
+
 
 
 
