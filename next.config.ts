@@ -2,8 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  output: "standalone",
   images: {
-    domains: ["djethkxabnuydbbnbsgn.supabase.co"], // ✅ allows Supabase-hosted images/videos
+    domains: ["djethkxabnuydbbnbsgn.supabase.co"],
   },
 };
 
