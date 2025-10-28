@@ -27,7 +27,7 @@ export default function EventsPage() {
       color: "#F59E0B",
       desc: "Compete daily in pool and dart tournaments. Casual or competitive — there’s action for everyone, every day.",
       time: "Every Day • Sign-ups at 6PM",
-      video: `${supabaseBase}/tournaments.mp4`, // 👈 update to match actual Supabase file name
+      video: `${supabaseBase}/daily-tournaments.mp4`,
     },
     {
       id: "karaoke",
@@ -129,8 +129,8 @@ export default function EventsPage() {
                   reverse ? "md:flex-row-reverse" : "md:flex-row"
                 } items-center gap-6 border border-white/10 bg-[#111827]/70 
                 rounded-2xl p-6 backdrop-blur-md 
-                shadow-[0_0_25px_-5px_rgba(0,0,0,0.6)] hover:shadow-[0_0_35px_-5px_rgba(255,255,255,0.2)] 
-                transition-all`}
+                shadow-[0_0_25px_-5px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_-5px_rgba(255,255,255,0.25)] 
+                transition-all duration-500 hover:scale-[1.02]`}
                 style={{
                   borderColor: `${event.color}40`,
                   boxShadow: `0 0 25px -6px ${event.color}`,
@@ -141,13 +141,20 @@ export default function EventsPage() {
                   <div className="flex-shrink-0 w-full md:w-[280px] aspect-[9/16] overflow-hidden rounded-xl border border-white/10 relative">
                     <video
                       id={event.id}
-                      src={event.video}
                       playsInline
                       loop
                       preload="auto"
-                      className="w-full h-full object-cover rounded-xl cursor-pointer"
+                      muted
+                      crossOrigin="anonymous"
+                      controls={false}
+                      className="w-full h-full object-cover rounded-xl cursor-pointer transition-transform duration-500 hover:scale-105"
                       onClick={() => handlePlay(event.id)}
-                    />
+                    >
+                      <source src={event.video} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+
+                    {/* ▶️ Overlay Button */}
                     {activeVideo !== event.id && (
                       <button
                         onClick={() => handlePlay(event.id)}
@@ -201,6 +208,3 @@ export default function EventsPage() {
     </div>
   );
 }
-
-
-
