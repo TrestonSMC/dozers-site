@@ -13,18 +13,15 @@ export default function Home() {
   const [reviews, setReviews] = useState<any[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
 
-  // 🌐 Supabase public video base URL
   const supabaseBase =
     "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-videos";
 
-  // 🔹 Smooth scroll navigation
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth" });
     setMenuOpen(false);
   };
 
-  // 🔹 Toggle experience video playback
   const toggleVideo = () => {
     const video = videoRef.current;
     if (!video) return;
@@ -38,7 +35,6 @@ export default function Home() {
     }
   };
 
-  // 🔹 Fallback reviews
   const fallbackReviews = [
     {
       author: "Sarah L.",
@@ -60,7 +56,6 @@ export default function Home() {
     },
   ];
 
-  // 🔹 Fetch reviews
   useEffect(() => {
     const fetchReviews = async () => {
       try {
@@ -81,7 +76,6 @@ export default function Home() {
     fetchReviews();
   }, []);
 
-  // 🔹 Events
   const events = [
     {
       id: "geeks",
@@ -143,14 +137,40 @@ export default function Home() {
         {menuOpen && (
           <div className="absolute top-full right-8 mt-2 w-56 bg-[#111827]/95 border border-[#29C3FF]/30 rounded-xl shadow-lg backdrop-blur-lg z-50">
             <ul className="flex flex-col text-center py-3 text-sm uppercase tracking-wider">
-              {["about", "experience", "events", "contact"].map((item) => (
+              {["about", "gallery", "events", "contact"].map((item) => (
                 <li key={item}>
-                  <button
-                    onClick={() => scrollToSection(item)}
-                    className="block w-full py-3 hover:bg-[#29C3FF]/10 text-gray-300 hover:text-[#F59E0B] transition"
-                  >
-                    {item.charAt(0).toUpperCase() + item.slice(1)}
-                  </button>
+                  {item === "about" ? (
+                    <Link
+                      href="/about"
+                      onClick={() => setMenuOpen(false)}
+                      className="block w-full py-3 hover:bg-[#29C3FF]/10 text-gray-300 hover:text-[#F59E0B] transition"
+                    >
+                      About
+                    </Link>
+                  ) : item === "gallery" ? (
+                    <Link
+                      href="/gallery"
+                      onClick={() => setMenuOpen(false)}
+                      className="block w-full py-3 hover:bg-[#29C3FF]/10 text-gray-300 hover:text-[#F59E0B] transition"
+                    >
+                      Gallery
+                    </Link>
+                  ) : item === "events" ? (
+                    <Link
+                      href="/events"
+                      onClick={() => setMenuOpen(false)}
+                      className="block w-full py-3 hover:bg-[#29C3FF]/10 text-gray-300 hover:text-[#F59E0B] transition"
+                    >
+                      Events
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={() => scrollToSection(item)}
+                      className="block w-full py-3 hover:bg-[#29C3FF]/10 text-gray-300 hover:text-[#F59E0B] transition"
+                    >
+                      {item.charAt(0).toUpperCase() + item.slice(1)}
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>
@@ -177,7 +197,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 🟢 EXPERIENCE */}
+      {/* 🟢 EXPERIENCE / GALLERY PROMO */}
       <section
         id="experience"
         className="relative py-24 px-6 md:px-20 flex flex-col md:flex-row items-center gap-10 border-t border-[#10B981]/20 bg-[#111827]/70 backdrop-blur-md overflow-hidden"
@@ -186,10 +206,19 @@ export default function Home() {
           <h2 className="text-4xl font-[Playfair_Display] mb-6 text-white drop-shadow-[0_0_25px_rgba(16,185,129,0.4)]">
             The Experience
           </h2>
-          <p className="text-gray-300 text-lg leading-relaxed">
+          <p className="text-gray-300 text-lg leading-relaxed mb-8">
             Step into a world where precision meets atmosphere. Our modern tables, ambient lighting,
-            and handcrafted cocktails make every visit unforgettable.
+            and handcrafted cocktails make every visit unforgettable. With over 40 flat screen TVs
+            and comfortable seating, Dozers Grill becomes more than just a pool hall — it becomes
+            an experience.
           </p>
+
+          {/* 🔹 Gallery Button */}
+          <Link href="/gallery">
+            <Button className="border-0 text-white bg-gradient-to-r from-[#10B981] to-[#29C3FF] px-8 py-4 rounded-full text-lg tracking-wider hover:scale-105 transition-transform shadow-[0_0_25px_-5px_rgba(16,185,129,0.6)]">
+              View Photo Gallery
+            </Button>
+          </Link>
         </div>
 
         {/* 🎬 Tap-to-Play Video */}
@@ -278,7 +307,9 @@ export default function Home() {
             <h2 className="text-4xl font-[Playfair_Display] mb-6 text-white drop-shadow-[0_0_25px_rgba(245,158,11,0.4)]">
               Visit Dozers Grill
             </h2>
-            <p className="text-gray-300 mb-2 text-lg">7012 E Hampton Ave, Mesa, AZ 85209</p>
+            <p className="text-gray-300 mb-2 text-lg">
+              7012 E Hampton Ave, Mesa, AZ 85209
+            </p>
             <p className="text-gray-300 mb-2 text-lg">(480) 463-3367</p>
             <p className="text-gray-300 mb-4 text-lg">Open Daily • 10 AM – 2 AM</p>
             <p className="text-gray-400 mb-8 text-sm">
@@ -334,12 +365,16 @@ export default function Home() {
                 <div className="flex justify-center text-[#F59E0B] mb-3 text-sm">
                   {"★".repeat(r.rating || 5)}
                 </div>
-                <p className="text-gray-300 italic leading-relaxed">“{r.text}”</p>
+                <p className="text-gray-300 italic leading-relaxed">
+                  “{r.text}”
+                </p>
               </motion.div>
             ))}
           </div>
         ) : (
-          <p className="text-gray-500">No 5-star reviews available yet — check back soon!</p>
+          <p className="text-gray-500">
+            No 5-star reviews available yet — check back soon!
+          </p>
         )}
       </section>
 
@@ -350,15 +385,6 @@ export default function Home() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
 
 
 

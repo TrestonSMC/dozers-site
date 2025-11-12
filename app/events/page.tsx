@@ -108,7 +108,7 @@ export default function EventsPage() {
       {/* 🔹 Page Header */}
       <section className="relative text-center py-40 z-10">
         <h1 className="text-6xl font-[Playfair_Display] font-bold text-white drop-shadow-[0_0_25px_rgba(139,92,246,0.6)]">
-          Events at Dozers Grill
+          Dozers Grill Event Calendar
         </h1>
         <p className="text-gray-400 mt-4 text-lg">
           Weekly events, prizes, and good vibes — all week long.
