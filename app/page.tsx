@@ -8,10 +8,19 @@ import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // ⭐ Dynamic events
+  const [events, setEvents] = useState<any[]>([]);
+
+  // ⭐ Dynamic reviews
   const [reviews, setReviews] = useState<any[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
+
+  // ⭐ 5-star filtered reviews
+  const fiveStarReviews = reviews.filter((r) => r.rating === 5);
 
   const supabaseBase =
     "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-videos";
@@ -35,40 +44,29 @@ export default function Home() {
     }
   };
 
-  const fallbackReviews = [
-    {
-      author: "Sarah L.",
-      rating: 5,
-      text: "Best pool hall in Mesa! The food was great and the atmosphere was awesome. Definitely coming back!",
-      time: "7/15/2025",
-    },
-    {
-      author: "Jake M.",
-      rating: 5,
-      text: "Friendly staff, clean tables, and solid drink specials. Perfect Friday night spot!",
-      time: "8/2/2025",
-    },
-    {
-      author: "Ava R.",
-      rating: 5,
-      text: "Trivia night was a blast! Super fun crowd and good food for a fair price.",
-      time: "6/29/2025",
-    },
-  ];
+  // ⭐ Load events
+  useEffect(() => {
+    const loadEvents = async () => {
+      try {
+        const res = await fetch("/api/events");
+        const data = await res.json();
+        setEvents(data.events || []);
+      } catch {
+        setEvents([]);
+      }
+    };
+    loadEvents();
+  }, []);
 
+  // ⭐ Load reviews
   useEffect(() => {
     const fetchReviews = async () => {
       try {
         const res = await fetch("/api/reviews");
         const data = await res.json();
-        if (data?.reviews?.length > 0) {
-          const onlyFiveStars = data.reviews.filter((r: any) => r.rating === 5);
-          setReviews(onlyFiveStars.length > 0 ? onlyFiveStars : fallbackReviews);
-        } else {
-          setReviews(fallbackReviews);
-        }
+        setReviews(data?.reviews || []);
       } catch {
-        setReviews(fallbackReviews);
+        setReviews([]);
       } finally {
         setLoadingReviews(false);
       }
@@ -76,33 +74,9 @@ export default function Home() {
     fetchReviews();
   }, []);
 
-  const events = [
-    {
-      id: "geeks",
-      title: "Geeks Who Drink",
-      desc: "Trivia Night with drinks, fun, and prizes for the top teams!",
-      time: "Thursdays • 7PM",
-      color: "#8B5CF6",
-    },
-    {
-      id: "tournaments",
-      title: "Daily Tournaments",
-      desc: "Join our daily pool and dart tournaments! Compete for prizes and bragging rights.",
-      time: "Every Day • Sign-ups at 6PM",
-      color: "#F59E0B",
-    },
-    {
-      id: "bingo",
-      title: "Bingo Night",
-      desc: "Hosted Bingo with prizes and giveaways. Come early for drink specials!",
-      time: "Mondays • 7PM",
-      color: "#3B82F6",
-    },
-  ];
-
   return (
     <div className="relative bg-[#0d1117] text-gray-100 overflow-x-hidden">
-      {/* 🔹 Background Video */}
+      {/* Background video */}
       <video
         autoPlay
         loop
@@ -114,10 +88,9 @@ export default function Home() {
         <source src={`${supabaseBase}/hero.mp4`} type="video/mp4" />
       </video>
 
-      {/* 🔹 Overlay */}
       <div className="fixed inset-0 bg-gradient-to-b from-transparent via-[#0d1117]/40 to-[#0d1117]/90 z-0" />
 
-      {/* 🔹 HEADER */}
+      {/* Header */}
       <header className="fixed top-0 left-0 w-full flex justify-between items-center px-8 py-5 z-50 backdrop-blur-md bg-[#0d1117]/70 border-b border-[#29C3FF]/20">
         <Image
           src="/images/dozers-logo.png"
@@ -139,38 +112,13 @@ export default function Home() {
             <ul className="flex flex-col text-center py-3 text-sm uppercase tracking-wider">
               {["about", "gallery", "events", "contact"].map((item) => (
                 <li key={item}>
-                  {item === "about" ? (
-                    <Link
-                      href="/about"
-                      onClick={() => setMenuOpen(false)}
-                      className="block w-full py-3 hover:bg-[#29C3FF]/10 text-gray-300 hover:text-[#F59E0B] transition"
-                    >
-                      About
-                    </Link>
-                  ) : item === "gallery" ? (
-                    <Link
-                      href="/gallery"
-                      onClick={() => setMenuOpen(false)}
-                      className="block w-full py-3 hover:bg-[#29C3FF]/10 text-gray-300 hover:text-[#F59E0B] transition"
-                    >
-                      Gallery
-                    </Link>
-                  ) : item === "events" ? (
-                    <Link
-                      href="/events"
-                      onClick={() => setMenuOpen(false)}
-                      className="block w-full py-3 hover:bg-[#29C3FF]/10 text-gray-300 hover:text-[#F59E0B] transition"
-                    >
-                      Events
-                    </Link>
-                  ) : (
-                    <button
-                      onClick={() => scrollToSection(item)}
-                      className="block w-full py-3 hover:bg-[#29C3FF]/10 text-gray-300 hover:text-[#F59E0B] transition"
-                    >
-                      {item.charAt(0).toUpperCase() + item.slice(1)}
-                    </button>
-                  )}
+                  <Link
+                    href={`/${item}`}
+                    onClick={() => setMenuOpen(false)}
+                    className="block w-full py-3 hover:bg-[#29C3FF]/10 text-gray-300 hover:text-[#F59E0B] transition"
+                  >
+                    {item.charAt(0).toUpperCase() + item.slice(1)}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -178,7 +126,7 @@ export default function Home() {
         )}
       </header>
 
-      {/* 🟧 HERO */}
+      {/* HERO */}
       <section className="relative min-h-screen flex flex-col justify-center items-center text-center px-4 z-10">
         <div className="absolute inset-0 bg-gradient-to-t from-[#0d1117]/70 via-transparent to-transparent z-0" />
         <h1 className="text-5xl md:text-7xl font-[Playfair_Display] font-bold text-white drop-shadow-[0_0_35px_rgba(245,158,11,0.6)] z-10">
@@ -197,7 +145,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 🟢 EXPERIENCE / GALLERY PROMO */}
+      {/* EXPERIENCE */}
       <section
         id="experience"
         className="relative py-24 px-6 md:px-20 flex flex-col md:flex-row items-center gap-10 border-t border-[#10B981]/20 bg-[#111827]/70 backdrop-blur-md overflow-hidden"
@@ -208,12 +156,9 @@ export default function Home() {
           </h2>
           <p className="text-gray-300 text-lg leading-relaxed mb-8">
             Step into a world where precision meets atmosphere. Our modern tables, ambient lighting,
-            and handcrafted cocktails make every visit unforgettable. With over 40 flat screen TVs
-            and comfortable seating, Dozers Grill becomes more than just a pool hall — it becomes
-            an experience.
+            and handcrafted cocktails make every visit unforgettable.
           </p>
 
-          {/* 🔹 Gallery Button */}
           <Link href="/gallery">
             <Button className="border-0 text-white bg-gradient-to-r from-[#10B981] to-[#29C3FF] px-8 py-4 rounded-full text-lg tracking-wider hover:scale-105 transition-transform shadow-[0_0_25px_-5px_rgba(16,185,129,0.6)]">
               View Photo Gallery
@@ -221,7 +166,6 @@ export default function Home() {
           </Link>
         </div>
 
-        {/* 🎬 Tap-to-Play Video */}
         <div className="relative flex-1 z-10 w-full">
           <div className="relative rounded-lg overflow-hidden shadow-[0_0_40px_-5px_rgba(16,185,129,0.5)] border border-[#10B981]/20">
             <video
@@ -255,7 +199,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 🟦 EVENTS */}
+      {/* EVENTS */}
       <section
         id="events"
         className="py-24 px-6 md:px-20 text-center border-t border-[#29C3FF]/20 bg-[#111827]/80 backdrop-blur-md"
@@ -264,40 +208,44 @@ export default function Home() {
           Upcoming Events
         </h2>
 
-        <div className="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto">
-          {events.map((event) => (
-            <motion.div
-              key={event.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="p-8 rounded-xl border border-white/10 bg-[#1a1f2a]/80 backdrop-blur-md hover:scale-[1.02] transition-transform"
-              style={{
-                boxShadow: `0 0 25px -6px ${event.color}`,
-                borderColor: `${event.color}40`,
-              }}
-            >
-              <h3 className="text-2xl font-semibold mb-2" style={{ color: event.color }}>
-                {event.title}
-              </h3>
-              <p className="text-gray-400 mb-3 text-sm">{event.time}</p>
-              <p className="text-gray-300 mb-6 text-base leading-relaxed">{event.desc}</p>
-              <Link href={`/events#${event.id}`}>
-                <Button
-                  className="text-white border-none px-6 py-3 rounded-full"
-                  style={{
-                    background: `linear-gradient(90deg, ${event.color} 0%, ${event.color}CC 100%)`,
-                  }}
-                >
-                  Learn More
-                </Button>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
+        {events.length === 0 ? (
+          <p className="text-gray-500 text-sm">Events coming soon...</p>
+        ) : (
+          <div className="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+            {events.map((event) => (
+              <motion.div
+                key={event.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className="p-8 rounded-xl border border-white/10 bg-[#1a1f2a]/80 backdrop-blur-md hover:scale-[1.02] transition-transform"
+                style={{
+                  boxShadow: `0 0 25px -6px ${event.color}`,
+                  borderColor: `${event.color}40`,
+                }}
+              >
+                <h3 className="text-2xl font-semibold mb-2" style={{ color: event.color }}>
+                  {event.title}
+                </h3>
+                <p className="text-gray-400 mb-3 text-sm">{event.time}</p>
+                <p className="text-gray-300 mb-6 text-base leading-relaxed">{event.desc}</p>
+                <Link href={`/events#${event.id}`}>
+                  <Button
+                    className="text-white border-none px-6 py-3 rounded-full"
+                    style={{
+                      background: `linear-gradient(90deg, ${event.color} 0%, ${event.color}CC 100%)`,
+                    }}
+                  >
+                    Learn More
+                  </Button>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </section>
 
-      {/* 🗺️ LOCATION */}
+      {/* LOCATION */}
       <section
         id="contact"
         className="py-24 px-6 md:px-20 border-t border-[#F59E0B]/20 bg-[#111827]/70 backdrop-blur-md"
@@ -307,9 +255,7 @@ export default function Home() {
             <h2 className="text-4xl font-[Playfair_Display] mb-6 text-white drop-shadow-[0_0_25px_rgba(245,158,11,0.4)]">
               Visit Dozers Grill
             </h2>
-            <p className="text-gray-300 mb-2 text-lg">
-              7012 E Hampton Ave, Mesa, AZ 85209
-            </p>
+            <p className="text-gray-300 mb-2 text-lg">7012 E Hampton Ave, Mesa, AZ 85209</p>
             <p className="text-gray-300 mb-2 text-lg">(480) 463-3367</p>
             <p className="text-gray-300 mb-4 text-lg">Open Daily • 10 AM – 2 AM</p>
             <p className="text-gray-400 mb-8 text-sm">
@@ -319,6 +265,7 @@ export default function Home() {
               Get Directions
             </Button>
           </div>
+
           <div className="flex-1 w-full rounded-2xl overflow-hidden border border-[#29C3FF]/30 shadow-[0_0_25px_-5px_rgba(41,195,255,0.4)]">
             <iframe
               title="Dozers Grill Map"
@@ -334,16 +281,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ⭐ REVIEWS */}
+      {/* REVIEWS */}
       <section className="py-24 px-6 md:px-20 text-center border-t border-[#29C3FF]/30 bg-[#0d1117]/80 backdrop-blur-md">
         <h2 className="text-4xl font-[Playfair_Display] text-white mb-10 drop-shadow-[0_0_25px_rgba(41,195,255,0.5)]">
           5-Star Customer Reviews
         </h2>
+
         {loadingReviews ? (
           <p className="text-gray-400">Loading reviews...</p>
-        ) : reviews.length > 0 ? (
+        ) : fiveStarReviews.length === 0 ? (
+          <p className="text-gray-500 text-sm">No 5-star reviews yet</p>
+        ) : (
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {reviews.map((r, i) => (
+            {fiveStarReviews.map((r: any, i: number) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
@@ -363,28 +313,24 @@ export default function Home() {
                   {r.time && <p className="text-gray-500 text-xs">{r.time}</p>}
                 </div>
                 <div className="flex justify-center text-[#F59E0B] mb-3 text-sm">
-                  {"★".repeat(r.rating || 5)}
+                  {"★".repeat(5)}
                 </div>
-                <p className="text-gray-300 italic leading-relaxed">
-                  “{r.text}”
-                </p>
+                <p className="text-gray-300 italic leading-relaxed">“{r.text}”</p>
               </motion.div>
             ))}
           </div>
-        ) : (
-          <p className="text-gray-500">
-            No 5-star reviews available yet — check back soon!
-          </p>
         )}
       </section>
 
-      {/* 🩶 FOOTER */}
+      {/* FOOTER */}
       <footer className="py-6 px-6 md:px-10 border-t border-[#29C3FF]/30 bg-[#0d1117]/80 backdrop-blur-md text-center text-gray-400">
         © 2025 Dozers Grill • All Rights Reserved
       </footer>
     </div>
   );
 }
+
+
 
 
 
