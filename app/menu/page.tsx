@@ -4,27 +4,31 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
-// ⭐ Featured Items (Your Photos)
-const featuredItems = [
-  {
-    name: "Smoked Paprika Parmesan Hummus",
-    img: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20Item%201.png",
-  },
-  {
-    name: "Baked Mac and Cheese",
-    img: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20Item%202.png",
-  },
-  {
-    name: "Spinach Artichoke Dip",
-    img: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20item%203.png",
-  },
-  {
-    name: "Baked Elote Dip and Chips",
-    img: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20item%204.png",
-  },
-];
+// ⭐ Photos mapped to menu sections (Option B)
+const sectionPhotos: Record<string, any[]> = {
+  "From the Oven": [
+    {
+      name: "Baked Mac and Cheese",
+      img: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20Item%202.png",
+    },
+    {
+      name: "Spinach Artichoke Dip",
+      img: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20item%203.png",
+    },
+    {
+      name: "Baked Elote Dip and Chips",
+      img: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20item%204.png",
+    },
+  ],
+  "From the Cooler": [
+    {
+      name: "Smoked Paprika Parmesan Hummus",
+      img: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20Item%201.png",
+    },
+  ],
+};
 
-// ⭐ Menu Sections (From the PDF)
+// ⭐ Menu Data
 const menu = [
   {
     title: "From the Oven",
@@ -78,10 +82,38 @@ const menu = [
   },
 ];
 
+// ⭐ Insert photos into their sections naturally
+function buildSectionContent(section: any) {
+  const content: any[] = [];
+  const photos = sectionPhotos[section.title] || [];
+
+  let photoIndex = 0;
+  const frequency = Math.ceil(section.items.length / (photos.length + 1));
+
+  section.items.forEach((item: string, i: number) => {
+    // Insert a photo every few items
+    if (photoIndex < photos.length && i % frequency === 0 && i !== 0) {
+      content.push({ type: "photo", ...photos[photoIndex] });
+      photoIndex++;
+    }
+
+    // Normal menu item
+    content.push({ type: "item", text: item });
+  });
+
+  // Add leftover photo at end if needed
+  while (photoIndex < photos.length) {
+    content.push({ type: "photo", ...photos[photoIndex] });
+    photoIndex++;
+  }
+
+  return content;
+}
+
 export default function MenuPage() {
   return (
     <div className="relative min-h-screen bg-[#0d1117] text-gray-100 overflow-hidden z-0">
-
+      
       {/* Background */}
       <div className="fixed inset-0 bg-[url('/images/background-texture.jpg')] bg-cover bg-center opacity-40 pointer-events-none z-0" />
       <div className="fixed inset-0 bg-gradient-to-b from-[#0d1117]/70 via-[#0d1117]/80 to-[#0d1117]/95 pointer-events-none z-10" />
@@ -106,9 +138,10 @@ export default function MenuPage() {
         </Link>
       </header>
 
+      {/* MAIN */}
       <main className="relative z-20 pt-32 pb-32">
-
-        {/* Page Header */}
+        
+        {/* Page Title */}
         <section className="relative py-14 text-center">
           <motion.h1
             initial={{ opacity: 0, y: 25 }}
@@ -123,84 +156,87 @@ export default function MenuPage() {
             Fresh favorites from the kitchen — crafted with flavor.
           </p>
 
-          {/* ⭐ NEW ANNOUNCEMENT */}
           <p className="text-[#29C3FF] mt-3 text-lg tracking-wide font-semibold drop-shadow-[0_0_12px_rgba(41,195,255,0.7)]">
             This Monday 11/17 lunch will now be available
           </p>
         </section>
 
-        {/* ⭐ Featured Items */}
-        <section className="px-6 md:px-16 mb-24">
-          <h2 className="text-3xl font-semibold mb-10 text-center text-[#29C3FF] drop-shadow-[0_0_15px_#29C3FF]">
-            Featured Dishes
-          </h2>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
-            {featuredItems.map((item, i) => (
-              <motion.div
-                key={item.name}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: i * 0.15 }}
-                className="rounded-xl overflow-hidden shadow-lg border border-[#29C3FF]/40 backdrop-blur-md bg-[#111827]/70 hover:shadow-[0_0_25px_#29C3FF] transition"
-              >
-                <Image
-                  src={item.img}
-                  alt={item.name}
-                  width={500}
-                  height={350}
-                  className="object-cover w-full h-48"
-                />
-                <div className="p-4 text-center">
-                  <h3 className="text-lg font-semibold">{item.name}</h3>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
-        {/* Menu Sections */}
+        {/* MENU SECTIONS */}
         <section className="px-6 md:px-16">
           <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-10">
-            {menu.map((section, i) => (
-              <motion.div
-                key={section.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="rounded-2xl p-8 backdrop-blur-md border bg-[#111827]/70"
-                style={{
-                  borderColor: `${section.color}60`,
-                  boxShadow: `0 0 25px -6px ${section.color}`,
-                }}
-              >
-                <h2
-                  className="text-2xl font-semibold mb-5 uppercase tracking-wider border-b pb-3"
-                  style={{ color: section.color, borderColor: `${section.color}40` }}
-                >
-                  {section.title}
-                </h2>
+            {menu.map((section) => {
+              const content = buildSectionContent(section);
 
-                <ul className="space-y-4">
-                  {section.items.map((item) => (
-                    <li key={item}>
-                      <span className="font-medium text-white">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
+              return (
+                <motion.div
+                  key={section.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="rounded-2xl p-8 backdrop-blur-md border bg-[#111827]/70"
+                  style={{
+                    borderColor: `${section.color}60`,
+                    boxShadow: `0 0 25px -6px ${section.color}`,
+                  }}
+                >
+                  <h2
+                    className="text-2xl font-semibold mb-5 uppercase tracking-wider border-b pb-3"
+                    style={{
+                      color: section.color,
+                      borderColor: `${section.color}40`,
+                    }}
+                  >
+                    {section.title}
+                  </h2>
+
+                  <div className="space-y-6">
+                    {content.map((entry, i) =>
+                      entry.type === "item" ? (
+                        <p key={i} className="text-white font-medium">
+                          {entry.text}
+                        </p>
+                      ) : (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          whileInView={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.6 }}
+                          className="rounded-xl overflow-hidden shadow-lg border border-[#29C3FF]/40 bg-[#111827]/70 backdrop-blur-md"
+                        >
+                          <div className="w-full h-[260px] bg-black">
+                            <Image
+                              src={entry.img}
+                              alt={entry.name}
+                              width={500}
+                              height={400}
+                              className="object-contain w-full h-full"
+                            />
+                          </div>
+
+                          <div className="p-4 text-center">
+                            <h3 className="text-lg font-semibold text-white">
+                              {entry.name}
+                            </h3>
+                          </div>
+                        </motion.div>
+                      )
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="py-6 px-6 md:px-10 border-t border-[#29C3FF]/30 bg-[#0d1117]/80 backdrop-blur-md text-gray-400 text-center">
+      {/* FOOTER */}
+      <footer className="py-6 px-6 md:px-10 border-t border-[#29C3FF]/30 bg-[#0d1117]/80 text-gray-400 text-center">
         © 2025 Dozers Grill • All Rights Reserved
       </footer>
     </div>
   );
 }
+
 
 
 

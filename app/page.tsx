@@ -19,17 +19,13 @@ export default function Home() {
   const [reviews, setReviews] = useState<any[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
 
-  // ⭐ 5-star filtered reviews
-  const fiveStarReviews = reviews.filter((r) => r.rating === 5);
+  // ⭐ FILTER: Show 4 & 5 star reviews only
+  const fourAndFiveStarReviews = reviews.filter(
+    (r) => Number(r.rating) >= 4
+  );
 
   const supabaseBase =
     "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-videos";
-
-  const scrollToSection = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-    setMenuOpen(false);
-  };
 
   const toggleVideo = () => {
     const video = videoRef.current;
@@ -228,7 +224,9 @@ export default function Home() {
                   {event.title}
                 </h3>
                 <p className="text-gray-400 mb-3 text-sm">{event.time}</p>
-                <p className="text-gray-300 mb-6 text-base leading-relaxed">{event.desc}</p>
+                <p className="text-gray-300 mb-6 text-base leading-relaxed">
+                  {event.desc}
+                </p>
                 <Link href={`/events#${event.id}`}>
                   <Button
                     className="text-white border-none px-6 py-3 rounded-full"
@@ -266,34 +264,33 @@ export default function Home() {
             </Button>
           </div>
 
+          {/* ⭐ CLEAN MAP */}
           <div className="flex-1 w-full rounded-2xl overflow-hidden border border-[#29C3FF]/30 shadow-[0_0_25px_-5px_rgba(41,195,255,0.4)]">
             <iframe
               title="Dozers Grill Map"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3323.0210246460677!2d-111.6835!3d33.3923!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x872ba83a17307f7b%3A0x3f5b1b4c6ef55e6a!2sDozers%20Grill!5e0!3m2!1sen!2sus!4v1739932650000!5m2!1sen!2sus"
+              src="https://www.google.com/maps?q=Dozers+Grill+Mesa+AZ&hl=en&z=15&output=embed"
               width="100%"
               height="400"
               style={{ border: 0 }}
-              allowFullScreen
               loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
             ></iframe>
           </div>
         </div>
       </section>
 
-      {/* REVIEWS */}
+      {/* ⭐ REVIEWS — 4 & 5 stars only */}
       <section className="py-24 px-6 md:px-20 text-center border-t border-[#29C3FF]/30 bg-[#0d1117]/80 backdrop-blur-md">
         <h2 className="text-4xl font-[Playfair_Display] text-white mb-10 drop-shadow-[0_0_25px_rgba(41,195,255,0.5)]">
-          5-Star Customer Reviews
+          Top Customer Reviews
         </h2>
 
         {loadingReviews ? (
           <p className="text-gray-400">Loading reviews...</p>
-        ) : fiveStarReviews.length === 0 ? (
-          <p className="text-gray-500 text-sm">No 5-star reviews yet</p>
+        ) : fourAndFiveStarReviews.length === 0 ? (
+          <p className="text-gray-500 text-sm">No top reviews yet</p>
         ) : (
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {fiveStarReviews.map((r: any, i: number) => (
+            {fourAndFiveStarReviews.map((r: any, i: number) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
@@ -312,10 +309,14 @@ export default function Home() {
                   <p className="text-[#29C3FF] font-semibold">{r.author}</p>
                   {r.time && <p className="text-gray-500 text-xs">{r.time}</p>}
                 </div>
+
                 <div className="flex justify-center text-[#F59E0B] mb-3 text-sm">
-                  {"★".repeat(5)}
+                  {"★".repeat(Number(r.rating))}
                 </div>
-                <p className="text-gray-300 italic leading-relaxed">“{r.text}”</p>
+
+                <p className="text-gray-300 italic leading-relaxed">
+                  “{r.text}”
+                </p>
               </motion.div>
             ))}
           </div>
@@ -329,6 +330,8 @@ export default function Home() {
     </div>
   );
 }
+
+
 
 
 
