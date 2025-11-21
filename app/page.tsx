@@ -44,7 +44,24 @@ export default function Home() {
       try {
         const res = await fetch("/api/events");
         const data = await res.json();
-        setEvents(data.events || []);
+
+        const all = data.events || [];
+        const now = new Date();
+
+        // ⭐ ONLY future events
+        const upcoming = all.filter((ev: any) => {
+          if (!ev.rawDate) return false;
+          const d = new Date(ev.rawDate);
+          return d >= now;
+        });
+
+        // ⭐ Sort future events by date
+        upcoming.sort(
+          (a: { rawDate: string | number | Date; }, b: { rawDate: string | number | Date; }) =>
+            new Date(a.rawDate).getTime() - new Date(b.rawDate).getTime()
+        );
+
+        setEvents(upcoming);
       } catch {
         setEvents([]);
       }
@@ -196,7 +213,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* EVENTS — ONLY 3 + DIFFERENT COLOR GLOWS */}
+      {/* EVENTS — ONLY FUTURE EVENTS */}
       <section
         id="events"
         className="py-24 px-6 md:px-20 text-center border-t border-[#29C3FF]/20 bg-[#111827]/80 backdrop-blur-md"
@@ -331,6 +348,7 @@ export default function Home() {
     </div>
   );
 }
+
 
 
 
