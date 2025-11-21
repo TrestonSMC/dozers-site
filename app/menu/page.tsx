@@ -4,238 +4,328 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
-// ⭐ Photos mapped to menu sections (Option B)
-const sectionPhotos: Record<string, any[]> = {
-  "From the Oven": [
-    {
-      name: "Baked Mac and Cheese",
-      img: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20Item%202.png",
-    },
-    {
-      name: "Spinach Artichoke Dip",
-      img: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20item%203.png",
-    },
-    {
-      name: "Baked Elote Dip and Chips",
-      img: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20item%204.png",
-    },
-  ],
-  "From the Cooler": [
-    {
-      name: "Smoked Paprika Parmesan Hummus",
-      img: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20Item%201.png",
-    },
-  ],
+// ===============================
+// TYPES – Fixes TypeScript error
+// ===============================
+type MenuItem = {
+  name: string;
+  price: number | string;
+  desc: string;
+  photo?: string;
 };
 
-// ⭐ Menu Data
-const menu = [
+type MenuSection = {
+  title: string;
+  color: string;
+  items: MenuItem[];
+};
+
+// ⭐ FOOD PHOTOS
+const foodPhotos = {
+  mac: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20Item%202.png",
+  artichoke: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20item%203.png",
+  elote: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20item%204.png",
+  hummus: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20Item%201.png",
+};
+
+// ===============================
+// ⭐ FINAL MENU (Ordered Correctly)
+// ===============================
+const menuSections: MenuSection[] = [
+  // ======================
+  // APPETIZERS
+  // ======================
   {
-    title: "From the Oven",
+    title: "Appetizers",
     color: "#29C3FF",
     items: [
-      "Slow Roasted Baby Back Ribs with Coleslaw and Mashed Potatoes with Gravy",
-      "Pulled Pork Sandwich with Coleslaw and Potato Salad",
-      "Baked Mac and Cheese",
-      "Baked Elote Dip with Tortillas",
-      "Spinach Artichoke Dip with Pita",
-      "Baked Feta with Balsamic Reduction, Kalamata Olives, Cucumbers, Red Onion & Sundried Tomato",
-      "Baked Gnocchi with Hot Italian Sausage, Peppers & Onions",
-      "Nachos with Three Cheeses, Lettuce, Tomato, Onion, Black Olives, Sour Cream & Guacamole",
+      {
+        name: "Baked Feta",
+        price: 14,
+        desc: "Feta baked until golden brown topped with Kalamata olives, cucumber, sundried tomato, red onion, drizzled w/ fig balsamic reduction.",
+      },
+      {
+        name: "Spinach Artichoke Dip",
+        price: 12,
+        desc: "Baked with mozzarella on top served with warmed pita bread.",
+        photo: foodPhotos.artichoke,
+      },
+      {
+        name: "Baked Elote Dip",
+        price: 12,
+        desc: "Fresh roasted corn mixed with our homemade elote cheese sauce served with tortilla chips.",
+        photo: foodPhotos.elote,
+      },
+      {
+        name: "Nachos",
+        price: 14,
+        desc: "Tortilla chips w/ three cheeses, lettuce, tomato, black olives & diced tomatoes. Served with sour cream & homemade guacamole.",
+      },
+      {
+        name: "Smoked Paprika Parmesan Hummus",
+        price: 12,
+        desc: "Served with fresh vegetables for dipping and warmed pita bread.",
+        photo: foodPhotos.hummus,
+      },
+      {
+        name: "Fresh Guacamole",
+        price: 13,
+        desc: "Fresh avocado mixed with red onion, roma tomatoes & diced jalapeños. Finished w/ pomegranate seeds & cotija.",
+      },
+      {
+        name: "Quesadilla",
+        price: 10,
+        desc: "12-inch flour tortilla filled w/ cheddar jack & chopped bacon, served with sour cream.",
+      },
     ],
   },
+
+  // ======================
+  // PANINIS
+  // ======================
   {
-    title: "From the Pan",
-    color: "#F59E0B",
-    items: [
-      "Pesto Pasta with Chicken, Cavatappi Pasta, Onions & Sundried Tomatoes",
-      "Meatball Pasta with Cavatappi Pasta, Marinara, Fresh Basil",
-    ],
-  },
-  {
-    title: "From the Press",
+    title: "Paninis",
     color: "#EC4899",
     items: [
-      "Caprese Panini with Pesto, Artichoke & Roasted Garlic Aioli",
-      "Italian Stallion (Capricola, Salami, Prosciutto)",
-      "Turkey Bacon Ranch Panini",
-      "Turkey, Spinach Artichoke Spread, Sundried Tomato, Salami & Gruyere",
-      "My Little Piggy (Ham, Bacon, Salami, Mustard, Pickle)",
-      "Roast Beef with Havarti, Pickles, Red Onions & Horseradish Aioli",
-      "Grilled Cheese with Bacon or Ham",
-      "Pesto Panini with Hot Italian Sausage, Peppers & Onions",
-      "Quesadilla with Bacon & Two Cheeses",
+      {
+        name: "Caprese Panini",
+        price: 13,
+        desc: "Fresh mozzarella, sliced tomatoes, artichoke, pesto & roasted garlic aioli pressed until golden brown.",
+      },
+      {
+        name: "Italian Stallion",
+        price: 15,
+        desc: "Prosciutto, capicolla, salami, pepperjack cheese & roasted garlic aioli pressed until golden brown.",
+      },
+      {
+        name: "Turkey Bacon Ranch",
+        price: 13,
+        desc: "Turkey, bacon, tomato & cheddar cheese with ranch spread. Pressed until golden brown.",
+      },
+      {
+        name: "Around the World",
+        price: 13,
+        desc: "Spinach artichoke dip spread, turkey, salami, Gruyere & sundried tomato. Pressed until golden brown.",
+      },
+      {
+        name: "My Little Piggy",
+        price: 14,
+        desc: "Ham, bacon, salami, pepperjack cheese, mustard & pickle pressed until golden brown.",
+      },
+      {
+        name: "Roast Beef & Havarti",
+        price: 15,
+        desc: "Roast beef, pickles, red onion & horseradish aioli pressed until golden brown.",
+      },
+      {
+        name: "Grilled Cheese w/ Bacon",
+        price: 12,
+        desc: "Cheddar, Gruyere, pepperjack & bacon pressed until golden brown.",
+      },
+      {
+        name: "Pesto Panini",
+        price: 13,
+        desc: "Pesto spread, hot Italian sausage, peppers, onions & pepper jack cheese pressed until golden brown.",
+      },
     ],
   },
+
+  // ======================
+  // PASTAS
+  // ======================
   {
-    title: "From the Cooler",
+    title: "Pastas",
+    color: "#3B82F6",
+    items: [
+      {
+        name: "Baked Gnocchi",
+        price: 14,
+        desc: "Potato dumpling pasta with hot Italian sausage, peppers, onions & marinara. Topped with mozzarella & baked. Served w/ ciabatta.",
+      },
+      {
+        name: "Baked Meatball Pasta",
+        price: 15,
+        desc: "All beef meatballs, cavatappi pasta & marinara topped with mozzarella & baked. Served w/ ciabatta.",
+      },
+      {
+        name: "Pesto Chicken Pasta",
+        price: 14,
+        desc: "Cavatappi pasta, pesto cream sauce, onions, sundried tomatoes, chicken & mozzarella. Baked & served w/ ciabatta.",
+      },
+      {
+        name: "Baked Mac & Cheese",
+        price: 10,
+        desc: "Three cheese mac topped with sharp cheddar & breadcrumbs. Served w/ toasted ciabatta.",
+        photo: foodPhotos.mac,
+      },
+    ],
+  },
+
+  // ======================
+  // ENTREES
+  // ======================
+  {
+    title: "Entrees",
+    color: "#EF4444",
+    items: [
+      {
+        name: "Slow Roasted Baby Back Ribs",
+        price: "18 / 26",
+        desc: "¼ rack or ½ rack served with mashed potatoes & gravy and coleslaw.",
+      },
+      {
+        name: "Pulled Pork Sandwich",
+        price: 12,
+        desc: "Slow roasted pork shoulder tossed in North Carolina BBQ sauce on brioche. Served with potato salad or coleslaw.",
+      },
+      {
+        name: "Baked Meatball Sub",
+        price: 15,
+        desc: "All beef meatballs in house marinara, topped with mozzarella & baked inside a hoagie roll.",
+      },
+    ],
+  },
+
+  // ======================
+  // SALADS
+  // ======================
+  {
+    title: "Salads",
     color: "#10B981",
     items: [
-      "Caesar Salad",
-      "Cobb Salad",
-      "Greek Salad",
-      "House Salad",
-      "Off The Hook Crab Cake Salad",
-      "Smoked Paprika Parmesan Hummus with Pita & Veggies",
-      "Fresh Guacamole with Pomegranate Seeds & Tortilla Chips",
+      {
+        name: "Caesar Salad",
+        price: 10,
+        desc: "Romaine lettuce tossed with Caesar dressing, topped with shaved Parmesan and croutons.",
+      },
+      {
+        name: "Cobb Salad",
+        price: 12,
+        desc: "Iceberg lettuce, tomatoes, cucumbers, egg, bacon & blue cheese. Served with balsamic vinaigrette.",
+      },
+      {
+        name: "Greek Salad",
+        price: 12,
+        desc: "Romaine, cucumbers, feta, tomato, olives, red onion & sundried tomatoes with balsamic vinaigrette.",
+      },
+      {
+        name: "Add Chicken",
+        price: 6,
+        desc: "Add chicken to any salad.",
+      },
+    ],
+  },
+
+  // ======================
+  // SIDES
+  // ======================
+  {
+    title: "Sides",
+    color: "#FBBF24",
+    items: [
+      { name: "Mashed Potatoes & Gravy", price: 3, desc: "" },
+      { name: "Coleslaw", price: 3, desc: "" },
+      { name: "Potato Salad", price: 3, desc: "" },
+      { name: "Side Salad", price: 4, desc: "" },
+      { name: "Chips", price: 2, desc: "" },
     ],
   },
 ];
 
-// ⭐ Insert photos into their sections naturally
-function buildSectionContent(section: any) {
-  const content: any[] = [];
-  const photos = sectionPhotos[section.title] || [];
-
-  let photoIndex = 0;
-  const frequency = Math.ceil(section.items.length / (photos.length + 1));
-
-  section.items.forEach((item: string, i: number) => {
-    // Insert a photo every few items
-    if (photoIndex < photos.length && i % frequency === 0 && i !== 0) {
-      content.push({ type: "photo", ...photos[photoIndex] });
-      photoIndex++;
-    }
-
-    // Normal menu item
-    content.push({ type: "item", text: item });
-  });
-
-  // Add leftover photo at end if needed
-  while (photoIndex < photos.length) {
-    content.push({ type: "photo", ...photos[photoIndex] });
-    photoIndex++;
-  }
-
-  return content;
-}
+// ===============================
+// PAGE COMPONENT
+// ===============================
 
 export default function MenuPage() {
   return (
-    <div className="relative min-h-screen bg-[#0d1117] text-gray-100 overflow-hidden z-0">
-      
-      {/* Background */}
-      <div className="fixed inset-0 bg-[url('/images/background-texture.jpg')] bg-cover bg-center opacity-40 pointer-events-none z-0" />
-      <div className="fixed inset-0 bg-gradient-to-b from-[#0d1117]/70 via-[#0d1117]/80 to-[#0d1117]/95 pointer-events-none z-10" />
+    <div className="relative min-h-screen bg-[#0d1117] text-gray-100">
+      {/* Background Layers */}
+      <div className="fixed inset-0 bg-[url('/images/background-texture.jpg')] bg-cover opacity-40" />
+      <div className="fixed inset-0 bg-gradient-to-b from-[#0d1117]/70 to-[#0d1117]/95" />
 
       {/* Header */}
-      <header className="fixed top-0 left-0 w-full flex justify-between items-center px-10 py-6 z-50 backdrop-blur-md bg-[#0d1117]/70 border-b border-[#29C3FF]/20">
-        <Link href="/" className="flex items-center gap-3">
-          <Image
-            src="/images/dozers-logo.png"
-            alt="Dozers Grill Logo"
-            width={140}
-            height={60}
-            className="drop-shadow-[0_0_20px_rgba(41,195,255,0.4)]"
-          />
+      <header className="fixed top-0 left-0 w-full flex justify-between items-center px-10 py-6 backdrop-blur-md bg-[#0d1117]/70 border-b border-[#29C3FF]/20 z-50">
+        <Link href="/">
+          <Image src="/images/dozers-logo.png" alt="Dozers Logo" width={140} height={60} />
         </Link>
-
         <Link
           href="/"
-          className="text-[#29C3FF] border border-[#29C3FF]/50 px-6 py-2 rounded-full text-sm uppercase tracking-wider hover:bg-[#29C3FF]/20 hover:shadow-[0_0_20px_#29C3FF] transition"
+          className="text-[#29C3FF] px-6 py-2 rounded-full border border-[#29C3FF]/50 hover:bg-[#29C3FF]/20 transition"
         >
           Home
         </Link>
       </header>
 
-      {/* MAIN */}
-      <main className="relative z-20 pt-32 pb-32">
-        
-        {/* Page Title */}
-        <section className="relative py-14 text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 25 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            className="text-6xl font-[Playfair_Display] font-bold text-white drop-shadow-[0_0_30px_rgba(41,195,255,0.6)]"
-          >
-            Our Menu
-          </motion.h1>
+      {/* Main */}
+      <main className="pt-32 pb-24 relative z-20 px-6 md:px-16">
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center text-6xl font-[Playfair_Display] font-bold text-white mb-12"
+        >
+          Our Menu
+        </motion.h1>
 
-          <p className="text-gray-400 mt-3 text-lg">
-            Fresh favorites from the kitchen — crafted with flavor.
-          </p>
+        {/* MENU GRID */}
+        <div className="grid md:grid-cols-2 gap-12">
+          {menuSections.map((section) => (
+            <div
+              key={section.title}
+              className="p-8 rounded-2xl backdrop-blur-md bg-[#111827]/70 border"
+              style={{ borderColor: `${section.color}60` }}
+            >
+              <h2
+                className="text-2xl font-semibold mb-6 uppercase tracking-wider border-b pb-3"
+                style={{
+                  color: section.color,
+                  borderColor: `${section.color}40`,
+                }}
+              >
+                {section.title}
+              </h2>
 
-          <p className="text-[#29C3FF] mt-3 text-lg tracking-wide font-semibold drop-shadow-[0_0_12px_rgba(41,195,255,0.7)]">
-            This Monday 11/17 lunch will now be available
-          </p>
-        </section>
+              <div className="space-y-8">
+                {section.items.map((item, i) => (
+                  <div key={i}>
+                    {/* Name + Price */}
+                    <div className="flex justify-between text-white font-semibold text-lg">
+                      <span>{item.name}</span>
+                      <span className="text-[#29C3FF]">${item.price}</span>
+                    </div>
 
-        {/* MENU SECTIONS */}
-        <section className="px-6 md:px-16">
-          <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-10">
-            {menu.map((section) => {
-              const content = buildSectionContent(section);
+                    {/* Description */}
+                    {item.desc && (
+                      <p className="text-gray-400 text-sm mt-1">{item.desc}</p>
+                    )}
 
-              return (
-                <motion.div
-                  key={section.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                  className="rounded-2xl p-8 backdrop-blur-md border bg-[#111827]/70"
-                  style={{
-                    borderColor: `${section.color}60`,
-                    boxShadow: `0 0 25px -6px ${section.color}`,
-                  }}
-                >
-                  <h2
-                    className="text-2xl font-semibold mb-5 uppercase tracking-wider border-b pb-3"
-                    style={{
-                      color: section.color,
-                      borderColor: `${section.color}40`,
-                    }}
-                  >
-                    {section.title}
-                  </h2>
-
-                  <div className="space-y-6">
-                    {content.map((entry, i) =>
-                      entry.type === "item" ? (
-                        <p key={i} className="text-white font-medium">
-                          {entry.text}
-                        </p>
-                      ) : (
-                        <motion.div
-                          key={i}
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          whileInView={{ opacity: 1, scale: 1 }}
-                          transition={{ duration: 0.6 }}
-                          className="rounded-xl overflow-hidden shadow-lg border border-[#29C3FF]/40 bg-[#111827]/70 backdrop-blur-md"
-                        >
-                          <div className="w-full h-[260px] bg-black">
-                            <Image
-                              src={entry.img}
-                              alt={entry.name}
-                              width={500}
-                              height={400}
-                              className="object-contain w-full h-full"
-                            />
-                          </div>
-
-                          <div className="p-4 text-center">
-                            <h3 className="text-lg font-semibold text-white">
-                              {entry.name}
-                            </h3>
-                          </div>
-                        </motion.div>
-                      )
+                    {/* Photo */}
+                    {item.photo && (
+                      <div className="mt-4 rounded-xl overflow-hidden border border-[#29C3FF]/40">
+                        <Image
+                          src={item.photo}
+                          alt={item.name}
+                          width={900}
+                          height={700}
+                          className="w-full h-64 object-contain bg-black"
+                        />
+                      </div>
                     )}
                   </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </section>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </main>
 
-      {/* FOOTER */}
-      <footer className="py-6 px-6 md:px-10 border-t border-[#29C3FF]/30 bg-[#0d1117]/80 text-gray-400 text-center">
+      {/* Footer */}
+      <footer className="text-center text-gray-400 py-6 border-t border-[#29C3FF]/30 mt-10">
         © 2025 Dozers Grill • All Rights Reserved
       </footer>
     </div>
   );
 }
+
 
 
 

@@ -20,9 +20,7 @@ export default function Home() {
   const [loadingReviews, setLoadingReviews] = useState(true);
 
   // ⭐ FILTER: Show 4 & 5 star reviews only
-  const fourAndFiveStarReviews = reviews.filter(
-    (r) => Number(r.rating) >= 4
-  );
+  const fourAndFiveStarReviews = reviews.filter((r) => Number(r.rating) >= 4);
 
   const supabaseBase =
     "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-videos";
@@ -69,6 +67,9 @@ export default function Home() {
     };
     fetchReviews();
   }, []);
+
+  // ⭐ Colors to rotate for event cards
+  const eventColors = ["#29C3FF", "#F59E0B", "#10B981"];
 
   return (
     <div className="relative bg-[#0d1117] text-gray-100 overflow-x-hidden">
@@ -195,7 +196,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* EVENTS */}
+      {/* EVENTS — ONLY 3 + DIFFERENT COLOR GLOWS */}
       <section
         id="events"
         className="py-24 px-6 md:px-20 text-center border-t border-[#29C3FF]/20 bg-[#111827]/80 backdrop-blur-md"
@@ -207,39 +208,39 @@ export default function Home() {
         {events.length === 0 ? (
           <p className="text-gray-500 text-sm">Events coming soon...</p>
         ) : (
-          <div className="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto">
-            {events.map((event) => (
-              <motion.div
-                key={event.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-                className="p-8 rounded-xl border border-white/10 bg-[#1a1f2a]/80 backdrop-blur-md hover:scale-[1.02] transition-transform"
-                style={{
-                  boxShadow: `0 0 25px -6px ${event.color}`,
-                  borderColor: `${event.color}40`,
-                }}
-              >
-                <h3 className="text-2xl font-semibold mb-2" style={{ color: event.color }}>
-                  {event.title}
-                </h3>
-                <p className="text-gray-400 mb-3 text-sm">{event.time}</p>
-                <p className="text-gray-300 mb-6 text-base leading-relaxed">
-                  {event.desc}
-                </p>
-                <Link href={`/events#${event.id}`}>
-                  <Button
-                    className="text-white border-none px-6 py-3 rounded-full"
+          <>
+            <div className="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto mb-16">
+              {events.slice(0, 3).map((event, i) => {
+                const color = eventColors[i % eventColors.length];
+                return (
+                  <motion.div
+                    key={event.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="p-8 rounded-xl border bg-[#1a1f2a]/80 backdrop-blur-md hover:scale-[1.02] transition-transform"
                     style={{
-                      background: `linear-gradient(90deg, ${event.color} 0%, ${event.color}CC 100%)`,
+                      borderColor: `${color}40`,
+                      boxShadow: `0 0 25px -5px ${color}`,
                     }}
                   >
-                    Learn More
-                  </Button>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
+                    <h3 className="text-2xl font-semibold mb-2" style={{ color }}>
+                      {event.title}
+                    </h3>
+                    <p className="text-gray-400 mb-3 text-sm">{event.time}</p>
+                    <p className="text-gray-300 text-base leading-relaxed">{event.desc}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* VIEW ALL EVENTS BUTTON */}
+            <Link href="/events">
+              <Button className="border-0 text-white bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-10 py-4 rounded-full text-lg tracking-wider hover:scale-105 transition-transform">
+                View All Events
+              </Button>
+            </Link>
+          </>
         )}
       </section>
 
@@ -264,7 +265,7 @@ export default function Home() {
             </Button>
           </div>
 
-          {/* ⭐ CLEAN MAP */}
+          {/* Map */}
           <div className="flex-1 w-full rounded-2xl overflow-hidden border border-[#29C3FF]/30 shadow-[0_0_25px_-5px_rgba(41,195,255,0.4)]">
             <iframe
               title="Dozers Grill Map"
@@ -278,7 +279,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ⭐ REVIEWS — 4 & 5 stars only */}
+      {/* REVIEWS */}
       <section className="py-24 px-6 md:px-20 text-center border-t border-[#29C3FF]/30 bg-[#0d1117]/80 backdrop-blur-md">
         <h2 className="text-4xl font-[Playfair_Display] text-white mb-10 drop-shadow-[0_0_25px_rgba(41,195,255,0.5)]">
           Top Customer Reviews
@@ -290,7 +291,7 @@ export default function Home() {
           <p className="text-gray-500 text-sm">No top reviews yet</p>
         ) : (
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {fourAndFiveStarReviews.map((r: any, i: number) => (
+            {fourAndFiveStarReviews.map((r, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
@@ -330,6 +331,7 @@ export default function Home() {
     </div>
   );
 }
+
 
 
 
