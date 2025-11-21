@@ -16,14 +16,20 @@ export default function EventsPage() {
         const data = await res.json();
         if (!data.events) return setEvents([]);
 
-        // Sort events by date
-        const sorted = data.events.sort(
+        const now = new Date();
+
+        // ⭐ Filter out past events
+        const upcoming = data.events.filter((ev: any) => {
+          return new Date(ev.rawDate).getTime() >= now.getTime();
+        });
+
+        // ⭐ Sort by date
+        const sorted = upcoming.sort(
           (a: any, b: any) =>
-            new Date(a.rawDate).getTime() -
-            new Date(b.rawDate).getTime()
+            new Date(a.rawDate).getTime() - new Date(b.rawDate).getTime()
         );
 
-        // Only keep first 7 events
+        // ⭐ Only keep the next 7 upcoming events
         setEvents(sorted.slice(0, 7));
       } catch {
         setEvents([]);
@@ -105,7 +111,6 @@ export default function EventsPage() {
                     boxShadow: `0 0 25px -6px ${color}`,
                   }}
                 >
-                  {/* Text Only */}
                   <div className="flex-1 text-center md:text-left">
                     <h2
                       className="text-3xl font-semibold mb-2"
@@ -147,4 +152,5 @@ export default function EventsPage() {
     </div>
   );
 }
+
 
