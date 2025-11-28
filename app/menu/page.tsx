@@ -5,31 +5,37 @@ import Image from "next/image";
 import Link from "next/link";
 
 // ===============================
-// TYPES – Fixes TypeScript error
+// TYPES – Section now has featuredPhoto
 // ===============================
 type MenuItem = {
   name: string;
   price: number | string;
   desc: string;
-  photo?: string;
 };
 
 type MenuSection = {
   title: string;
   color: string;
+  featuredPhoto?: string;
   items: MenuItem[];
 };
 
-// ⭐ FOOD PHOTOS
-const foodPhotos = {
-  mac: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20Item%202.png",
-  artichoke: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20item%203.png",
-  elote: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20item%204.png",
-  hummus: "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Food%20Item%201.png",
+// ⭐ NAMED FOOD PHOTOS ONLY
+const photos = {
+  bakedFeta:
+    "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Baked Feta.png",
+  greekSalad:
+    "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Greek Salad.png",
+  mac:
+    "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Mac N Chz.png",
+  pestoPanini:
+    "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Pesto Panini.png",
+  ribs:
+    "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/Menu/Ribs.png",
 };
 
 // ===============================
-// ⭐ FINAL MENU (Ordered Correctly)
+// ⭐ FINAL MENU WITH FEATURED PHOTOS
 // ===============================
 const menuSections: MenuSection[] = [
   // ======================
@@ -38,6 +44,7 @@ const menuSections: MenuSection[] = [
   {
     title: "Appetizers",
     color: "#29C3FF",
+    featuredPhoto: photos.bakedFeta,
     items: [
       {
         name: "Baked Feta",
@@ -48,13 +55,11 @@ const menuSections: MenuSection[] = [
         name: "Spinach Artichoke Dip",
         price: 12,
         desc: "Baked with mozzarella on top served with warmed pita bread.",
-        photo: foodPhotos.artichoke,
       },
       {
         name: "Baked Elote Dip",
         price: 12,
         desc: "Fresh roasted corn mixed with our homemade elote cheese sauce served with tortilla chips.",
-        photo: foodPhotos.elote,
       },
       {
         name: "Nachos",
@@ -65,7 +70,6 @@ const menuSections: MenuSection[] = [
         name: "Smoked Paprika Parmesan Hummus",
         price: 12,
         desc: "Served with fresh vegetables for dipping and warmed pita bread.",
-        photo: foodPhotos.hummus,
       },
       {
         name: "Fresh Guacamole",
@@ -86,6 +90,7 @@ const menuSections: MenuSection[] = [
   {
     title: "Paninis",
     color: "#EC4899",
+    featuredPhoto: photos.pestoPanini,
     items: [
       {
         name: "Caprese Panini",
@@ -136,6 +141,7 @@ const menuSections: MenuSection[] = [
   {
     title: "Pastas",
     color: "#3B82F6",
+    featuredPhoto: photos.mac,
     items: [
       {
         name: "Baked Gnocchi",
@@ -156,7 +162,6 @@ const menuSections: MenuSection[] = [
         name: "Baked Mac & Cheese",
         price: 10,
         desc: "Three cheese mac topped with sharp cheddar & breadcrumbs. Served w/ toasted ciabatta.",
-        photo: foodPhotos.mac,
       },
     ],
   },
@@ -167,6 +172,7 @@ const menuSections: MenuSection[] = [
   {
     title: "Entrees",
     color: "#EF4444",
+    featuredPhoto: photos.ribs,
     items: [
       {
         name: "Slow Roasted Baby Back Ribs",
@@ -192,6 +198,7 @@ const menuSections: MenuSection[] = [
   {
     title: "Salads",
     color: "#10B981",
+    featuredPhoto: photos.greekSalad,
     items: [
       {
         name: "Caesar Salad",
@@ -217,11 +224,12 @@ const menuSections: MenuSection[] = [
   },
 
   // ======================
-  // SIDES
+  // SIDES (No Photo)
   // ======================
   {
     title: "Sides",
     color: "#FBBF24",
+    featuredPhoto: undefined,
     items: [
       { name: "Mashed Potatoes & Gravy", price: 3, desc: "" },
       { name: "Coleslaw", price: 3, desc: "" },
@@ -239,7 +247,8 @@ const menuSections: MenuSection[] = [
 export default function MenuPage() {
   return (
     <div className="relative min-h-screen bg-[#0d1117] text-gray-100">
-      {/* Background Layers */}
+      
+      {/* Background */}
       <div className="fixed inset-0 bg-[url('/images/background-texture.jpg')] bg-cover opacity-40" />
       <div className="fixed inset-0 bg-gradient-to-b from-[#0d1117]/70 to-[#0d1117]/95" />
 
@@ -248,16 +257,14 @@ export default function MenuPage() {
         <Link href="/">
           <Image src="/images/dozers-logo.png" alt="Dozers Logo" width={140} height={60} />
         </Link>
-        <Link
-          href="/"
-          className="text-[#29C3FF] px-6 py-2 rounded-full border border-[#29C3FF]/50 hover:bg-[#29C3FF]/20 transition"
-        >
+        <Link href="/" className="text-[#29C3FF] px-6 py-2 rounded-full border border-[#29C3FF]/50 hover:bg-[#29C3FF]/20 transition">
           Home
         </Link>
       </header>
 
-      {/* Main */}
       <main className="pt-32 pb-24 relative z-20 px-6 md:px-16">
+
+        {/* Title */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -266,59 +273,55 @@ export default function MenuPage() {
           Our Menu
         </motion.h1>
 
-        {/* MENU GRID */}
+        {/* GRID */}
         <div className="grid md:grid-cols-2 gap-12">
           {menuSections.map((section) => (
-            <div
-              key={section.title}
+            <div key={section.title}
               className="p-8 rounded-2xl backdrop-blur-md bg-[#111827]/70 border"
               style={{ borderColor: `${section.color}60` }}
             >
+              {/* SECTION HEADER */}
               <h2
                 className="text-2xl font-semibold mb-6 uppercase tracking-wider border-b pb-3"
-                style={{
-                  color: section.color,
-                  borderColor: `${section.color}40`,
-                }}
+                style={{ color: section.color, borderColor: `${section.color}40` }}
               >
                 {section.title}
               </h2>
 
+              {/* ⭐ FEATURED PHOTO */}
+              {section.featuredPhoto && (
+                <div className="mb-6 rounded-xl overflow-hidden border border-[#29C3FF]/40">
+                  <Image
+                    src={section.featuredPhoto}
+                    alt={`${section.title} Featured`}
+                    width={900}
+                    height={700}
+                    className="w-full h-64 object-cover bg-black"
+                  />
+                </div>
+              )}
+
+              {/* ITEMS */}
               <div className="space-y-8">
                 {section.items.map((item, i) => (
                   <div key={i}>
-                    {/* Name + Price */}
                     <div className="flex justify-between text-white font-semibold text-lg">
                       <span>{item.name}</span>
                       <span className="text-[#29C3FF]">${item.price}</span>
                     </div>
 
-                    {/* Description */}
                     {item.desc && (
                       <p className="text-gray-400 text-sm mt-1">{item.desc}</p>
-                    )}
-
-                    {/* Photo */}
-                    {item.photo && (
-                      <div className="mt-4 rounded-xl overflow-hidden border border-[#29C3FF]/40">
-                        <Image
-                          src={item.photo}
-                          alt={item.name}
-                          width={900}
-                          height={700}
-                          className="w-full h-64 object-contain bg-black"
-                        />
-                      </div>
                     )}
                   </div>
                 ))}
               </div>
+
             </div>
           ))}
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="text-center text-gray-400 py-6 border-t border-[#29C3FF]/30 mt-10">
         © 2025 Dozers Grill • All Rights Reserved
       </footer>
