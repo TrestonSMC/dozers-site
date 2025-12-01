@@ -4,15 +4,14 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-// Glow colors for events
 const eventColors = ["#29C3FF", "#F59E0B", "#10B981", "#EC4899", "#3B82F6", "#F97316"];
 
 export default function CalendarPage() {
   const [events, setEvents] = useState<any[]>([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedEvent, setSelectedEvent] = useState<any | null>(null); // ⭐ MODAL STATE
+  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
 
-  // ⭐ Fetch events (with rawDate)
+  // ⭐ Load events
   useEffect(() => {
     const loadEvents = async () => {
       try {
@@ -20,8 +19,7 @@ export default function CalendarPage() {
         const data = await res.json();
 
         const sorted = data.events.sort(
-          (a: any, b: any) =>
-            new Date(a.rawDate).getTime() - new Date(b.rawDate).getTime()
+          (a: any, b: any) => new Date(a.rawDate).getTime() - new Date(b.rawDate).getTime()
         );
 
         setEvents(sorted);
@@ -34,7 +32,7 @@ export default function CalendarPage() {
   }, []);
 
   // ------------------------
-  // ⭐ Month Calculations
+  // Month + Day Math
   // ------------------------
   const month = currentMonth.getMonth();
   const year = currentMonth.getFullYear();
@@ -42,26 +40,28 @@ export default function CalendarPage() {
   const getDaysInMonth = (m: number, y: number) => new Date(y, m + 1, 0).getDate();
   const days = getDaysInMonth(month, year);
 
-  const firstDayOfWeek = new Date(year, month, 1).getDay();
+  // ⭐ FIX — Align calendar to Monday-start (same as 7shifts)
+  let firstDayOfWeek = new Date(year, month, 1).getDay();
+  firstDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
 
   // ------------------------
-  // ⭐ Sort events into days
+  // Group events by day
   // ------------------------
   const eventsByDay: Record<number, any[]> = {};
 
-  events.forEach((event, eventIndex) => {
+  events.forEach((event, idx) => {
     const date = new Date(event.rawDate);
     if (date.getMonth() === month && date.getFullYear() === year) {
       const day = date.getDate();
       if (!eventsByDay[day]) eventsByDay[day] = [];
       eventsByDay[day].push({
         ...event,
-        color: eventColors[eventIndex % eventColors.length]
+        color: eventColors[idx % eventColors.length],
       });
     }
   });
 
-  // ⭐ Month Navigation
+  // Navigation
   const nextMonth = () => setCurrentMonth(new Date(year, month + 1, 1));
   const prevMonth = () => setCurrentMonth(new Date(year, month - 1, 1));
 
@@ -92,7 +92,7 @@ export default function CalendarPage() {
         </Link>
       </header>
 
-      {/* PAGE TITLE */}
+      {/* TITLE */}
       <section className="text-center pt-40 pb-10 relative z-10">
         <h1 className="text-6xl font-[Playfair_Display] font-bold drop-shadow-[0_0_30px_rgba(41,195,255,0.5)]">
           Full Event Calendar
@@ -104,10 +104,7 @@ export default function CalendarPage() {
 
       {/* MONTH SWITCHER */}
       <div className="flex justify-center items-center gap-6 text-xl font-semibold relative z-10 mb-10">
-        <button
-          onClick={prevMonth}
-          className="px-4 py-2 hover:text-[#29C3FF] transition"
-        >
+        <button onClick={prevMonth} className="px-4 py-2 hover:text-[#29C3FF] transition">
           ← Prev
         </button>
 
@@ -115,17 +112,16 @@ export default function CalendarPage() {
           {currentMonth.toLocaleString("en-US", { month: "long" })} {year}
         </span>
 
-        <button
-          onClick={nextMonth}
-          className="px-4 py-2 hover:text-[#29C3FF] transition"
-        >
+        <button onClick={nextMonth} className="px-4 py-2 hover:text-[#29C3FF] transition">
           Next →
         </button>
       </div>
 
-      {/* DESKTOP GRID VIEW */}
+      {/* GRID */}
       <div className="hidden md:grid grid-cols-7 gap-4 max-w-6xl mx-auto px-6 relative z-10 mb-20">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+
+        {/* ⭐ FIXED WEEKDAY HEADERS — Monday first */}
+        {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
           <div
             key={d}
             className="text-center text-gray-300 font-semibold border-b border-[#29C3FF]/30 pb-2"
@@ -134,10 +130,12 @@ export default function CalendarPage() {
           </div>
         ))}
 
+        {/* Empty Slots */}
         {[...Array(firstDayOfWeek)].map((_, i) => (
           <div key={`empty-${i}`} className="p-3 rounded-xl"></div>
         ))}
 
+        {/* Days */}
         {[...Array(days)].map((_, i) => {
           const day = i + 1;
           const dayEvents = eventsByDay[day] || [];
@@ -152,7 +150,7 @@ export default function CalendarPage() {
               {dayEvents.map((ev, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setSelectedEvent(ev)} // ⭐ OPEN MODAL
+                  onClick={() => setSelectedEvent(ev)}
                   className="text-left w-full text-xs px-2 py-1 rounded-md mb-1 transition hover:opacity-80"
                   style={{
                     backgroundColor: `${ev.color}30`,
@@ -168,7 +166,7 @@ export default function CalendarPage() {
         })}
       </div>
 
-      {/* MOBILE LIST VIEW */}
+      {/* MOBILE LIST */}
       <div className="md:hidden px-6 relative z-10">
         {events
           .filter((ev) => {
@@ -182,7 +180,7 @@ export default function CalendarPage() {
             return (
               <button
                 key={ev.id}
-                onClick={() => setSelectedEvent(ev)} // ⭐ OPEN MODAL
+                onClick={() => setSelectedEvent(ev)}
                 className="mb-6 p-4 w-full text-left rounded-xl border border-white/10 bg-[#111827]/70 backdrop-blur-md shadow-[0_0_20px_-5px_rgba(0,0,0,0.5)]"
                 style={{
                   borderColor: `${color}40`,
@@ -197,10 +195,7 @@ export default function CalendarPage() {
                   })}
                 </p>
 
-                <h2
-                  className="text-xl font-semibold mb-1"
-                  style={{ color }}
-                >
+                <h2 className="text-xl font-semibold mb-1" style={{ color }}>
                   {ev.title}
                 </h2>
 
@@ -210,7 +205,7 @@ export default function CalendarPage() {
           })}
       </div>
 
-      {/* ⭐ EVENT MODAL ⭐ */}
+      {/* MODAL */}
       {selectedEvent && (
         <div
           className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm"
@@ -259,5 +254,6 @@ export default function CalendarPage() {
     </div>
   );
 }
+
 
 
