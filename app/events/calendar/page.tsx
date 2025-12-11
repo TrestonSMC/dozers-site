@@ -15,11 +15,14 @@ export default function CalendarPage() {
   useEffect(() => {
     const loadEvents = async () => {
       try {
-        const res = await fetch("/api/events");
+        const res = await fetch("/api/events", {
+          cache: "no-store",
+        });
         const data = await res.json();
 
         const sorted = data.events.sort(
-          (a: any, b: any) => new Date(a.rawDate).getTime() - new Date(b.rawDate).getTime()
+          (a: any, b: any) =>
+            new Date(a.rawDate).getTime() - new Date(b.rawDate).getTime()
         );
 
         setEvents(sorted);
@@ -37,21 +40,24 @@ export default function CalendarPage() {
   const month = currentMonth.getMonth();
   const year = currentMonth.getFullYear();
 
-  const getDaysInMonth = (m: number, y: number) => new Date(y, m + 1, 0).getDate();
+  const getDaysInMonth = (m: number, y: number) =>
+    new Date(y, m + 1, 0).getDate();
+
   const days = getDaysInMonth(month, year);
 
-  // ⭐ FIX — Align calendar to Monday-start (same as 7shifts)
+  // ⭐ Monday-start alignment
   let firstDayOfWeek = new Date(year, month, 1).getDay();
   firstDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
 
   // ------------------------
-  // Group events by day
+  // Group events by day (ONLY show events in current visible month)
   // ------------------------
   const eventsByDay: Record<number, any[]> = {};
 
   events.forEach((event, idx) => {
     const date = new Date(event.rawDate);
-    if (date.getMonth() === month && date.getFullYear() === year) {
+
+    if (date.getFullYear() === year && date.getMonth() === month) {
       const day = date.getDate();
       if (!eventsByDay[day]) eventsByDay[day] = [];
       eventsByDay[day].push({
@@ -98,7 +104,7 @@ export default function CalendarPage() {
           Full Event Calendar
         </h1>
         <p className="text-gray-400 mt-3 text-lg">
-          Automatically updated from Dozers’ official 7shifts schedule.
+          Automatically updated from Dozers’ 7shifts schedule.
         </p>
       </section>
 
@@ -117,10 +123,10 @@ export default function CalendarPage() {
         </button>
       </div>
 
-      {/* GRID */}
+      {/* DESKTOP GRID */}
       <div className="hidden md:grid grid-cols-7 gap-4 max-w-6xl mx-auto px-6 relative z-10 mb-20">
 
-        {/* ⭐ FIXED WEEKDAY HEADERS — Monday first */}
+        {/* Weekday Headers */}
         {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
           <div
             key={d}
@@ -135,32 +141,48 @@ export default function CalendarPage() {
           <div key={`empty-${i}`} className="p-3 rounded-xl"></div>
         ))}
 
-        {/* Days */}
+        {/* DAYS */}
         {[...Array(days)].map((_, i) => {
           const day = i + 1;
           const dayEvents = eventsByDay[day] || [];
 
+          const isToday =
+            day === new Date().getDate() &&
+            month === new Date().getMonth() &&
+            year === new Date().getFullYear();
+
           return (
             <div
               key={day}
-              className="min-h-[120px] rounded-xl p-3 border border-white/10 bg-[#111827]/60 backdrop-blur-md hover:scale-[1.02] transition shadow-[0_0_15px_rgba(0,0,0,0.4)]"
+              className={`min-h-[120px] rounded-xl p-3 border border-white/10 bg-[#111827]/60 backdrop-blur-md transition hover:scale-[1.02] shadow-[0_0_15px_rgba(0,0,0,0.4)]
+                ${isToday ? "ring-2 ring-[#29C3FF] shadow-[0_0_25px_#29C3FF]" : ""}
+              `}
             >
-              <p className="text-gray-300 font-semibold mb-2">{day}</p>
+              <p
+                className={`font-semibold mb-2 ${
+                  isToday
+                    ? "text-[#29C3FF] font-bold drop-shadow-[0_0_12px_rgba(41,195,255,0.9)]"
+                    : "text-gray-300"
+                }`}
+              >
+                {day}
+              </p>
 
-              {dayEvents.map((ev, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedEvent(ev)}
-                  className="text-left w-full text-xs px-2 py-1 rounded-md mb-1 transition hover:opacity-80"
-                  style={{
-                    backgroundColor: `${ev.color}30`,
-                    borderLeft: `3px solid ${ev.color}`,
-                    boxShadow: `0 0 10px ${ev.color}60`,
-                  }}
-                >
-                  {ev.title}
-                </button>
-              ))}
+              {dayEvents.length > 0 &&
+                dayEvents.map((ev, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedEvent(ev)}
+                    className="text-left w-full text-xs px-2 py-1 rounded-md mb-1 transition hover:opacity-80"
+                    style={{
+                      backgroundColor: `${ev.color}30`,
+                      borderLeft: `3px solid ${ev.color}`,
+                      boxShadow: `0 0 10px ${ev.color}60`,
+                    }}
+                  >
+                    {ev.title}
+                  </button>
+                ))}
             </div>
           );
         })}
