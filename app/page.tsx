@@ -272,7 +272,7 @@ export default function Home() {
               Visit Dozers Grill
             </h2>
             <p className="text-gray-300 mb-2 text-lg">7012 E Hampton Ave, Mesa, AZ 85209</p>
-            <p className="text-gray-300 mb-2 text-lg">(480) 463-3367</p>
+            <p className="text-gray-300 mb-2 text-lg">(602) 694-5551</p>
             <p className="text-gray-300 mb-4 text-lg">Open Daily • 10 AM – 2 AM</p>
             <p className="text-gray-400 mb-8 text-sm">
               Kitchen: Mon–Thurs 4pm–10pm, Fri–Sun 10am–10pm
