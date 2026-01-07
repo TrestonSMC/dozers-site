@@ -57,7 +57,7 @@ export default function Home() {
 
         // ⭐ Sort future events by date
         upcoming.sort(
-          (a: { rawDate: string | number | Date; }, b: { rawDate: string | number | Date; }) =>
+          (a: any, b: any) =>
             new Date(a.rawDate).getTime() - new Date(b.rawDate).getTime()
         );
 
@@ -159,66 +159,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* EXPERIENCE */}
-      <section
-        id="experience"
-        className="relative py-24 px-6 md:px-20 flex flex-col md:flex-row items-center gap-10 border-t border-[#10B981]/20 bg-[#111827]/70 backdrop-blur-md overflow-hidden"
-      >
-        <div className="flex-1 text-center md:text-left z-10">
-          <h2 className="text-4xl font-[Playfair_Display] mb-6 text-white drop-shadow-[0_0_25px_rgba(16,185,129,0.4)]">
-            The Experience
-          </h2>
-          <p className="text-gray-300 text-lg leading-relaxed mb-8">
-            Step into a world where precision meets atmosphere. Our modern tables, ambient lighting,
-            and handcrafted cocktails make every visit unforgettable.
-          </p>
-
-          <Link href="/gallery">
-            <Button className="border-0 text-white bg-gradient-to-r from-[#10B981] to-[#29C3FF] px-8 py-4 rounded-full text-lg tracking-wider hover:scale-105 transition-transform shadow-[0_0_25px_-5px_rgba(16,185,129,0.6)]">
-              View Photo Gallery
-            </Button>
-          </Link>
-        </div>
-
-        <div className="relative flex-1 z-10 w-full">
-          <div className="relative rounded-lg overflow-hidden shadow-[0_0_40px_-5px_rgba(16,185,129,0.5)] border border-[#10B981]/20">
-            <video
-              ref={videoRef}
-              loop
-              playsInline
-              preload="auto"
-              className="w-full h-auto rounded-lg cursor-pointer"
-              onClick={toggleVideo}
-            >
-              <source src={`${supabaseBase}/experience.mp4`} type="video/mp4" />
-            </video>
-            {!isPlaying && (
-              <button
-                onClick={toggleVideo}
-                className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm hover:bg-black/30 transition"
-              >
-                <div className="p-4 rounded-full border border-white/30 shadow-[0_0_25px_rgba(16,185,129,0.6)] bg-[#10B981]/80">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="white"
-                    viewBox="0 0 24 24"
-                    className="w-10 h-10"
-                  >
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-              </button>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* EVENTS — ONLY FUTURE EVENTS */}
+      {/* EVENTS */}
       <section
         id="events"
         className="py-24 px-6 md:px-20 text-center border-t border-[#29C3FF]/20 bg-[#111827]/80 backdrop-blur-md"
       >
-        <h2 className="text-4xl md:text-5xl font-[Playfair_Display] text-white mb-10 drop-shadow-[0_0_25px_rgba(245,158,11,0.4)]">
+        <h2 className="text-4xl md:text-5xl font-[Playfair_Display] text-white mb-10">
           Upcoming Events
         </h2>
 
@@ -245,13 +191,12 @@ export default function Home() {
                       {event.title}
                     </h3>
                     <p className="text-gray-400 mb-3 text-sm">{event.time}</p>
-                    <p className="text-gray-300 text-base leading-relaxed">{event.desc}</p>
+                    <p className="text-gray-300">{event.desc}</p>
                   </motion.div>
                 );
               })}
             </div>
 
-            {/* VIEW ALL EVENTS BUTTON */}
             <Link href="/events">
               <Button className="border-0 text-white bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-10 py-4 rounded-full text-lg tracking-wider hover:scale-105 transition-transform">
                 View All Events
@@ -261,29 +206,33 @@ export default function Home() {
         )}
       </section>
 
-      {/* LOCATION */}
+      {/* LOCATION / CONTACT */}
       <section
         id="contact"
         className="py-24 px-6 md:px-20 border-t border-[#F59E0B]/20 bg-[#111827]/70 backdrop-blur-md"
       >
         <div className="flex flex-col md:flex-row items-center gap-10 max-w-6xl mx-auto">
           <div className="flex-1 text-center md:text-left">
-            <h2 className="text-4xl font-[Playfair_Display] mb-6 text-white drop-shadow-[0_0_25px_rgba(245,158,11,0.4)]">
+            <h2 className="text-4xl font-[Playfair_Display] mb-6 text-white">
               Visit Dozers Grill
             </h2>
-            <p className="text-gray-300 mb-2 text-lg">7012 E Hampton Ave, Mesa, AZ 85209</p>
-            <p className="text-gray-300 mb-2 text-lg">(602) 694-5551</p>
-            <p className="text-gray-300 mb-4 text-lg">Open Daily • 10 AM – 2 AM</p>
-            <p className="text-gray-400 mb-8 text-sm">
-              Kitchen: Mon–Thurs 4pm–10pm, Fri–Sun 10am–10pm
+            <p className="text-gray-300 mb-2 text-lg">
+              7012 E Hampton Ave, Mesa, AZ 85209
             </p>
-            <Button className="border-0 text-white bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-8 py-4 rounded-full hover:scale-105 transition-transform">
-              Get Directions
-            </Button>
+            <p className="text-gray-300 mb-2 text-lg">(602) 694-5551</p>
+            <p className="text-gray-300 mb-4 text-lg">
+              Open Daily • 10 AM – 2 AM
+            </p>
+
+            {/* ✅ UPDATED BUTTON */}
+            <Link href="/contact">
+              <Button className="border-0 text-white bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-8 py-4 rounded-full hover:scale-105 transition-transform">
+                Get Directions
+              </Button>
+            </Link>
           </div>
 
-          {/* Map */}
-          <div className="flex-1 w-full rounded-2xl overflow-hidden border border-[#29C3FF]/30 shadow-[0_0_25px_-5px_rgba(41,195,255,0.4)]">
+          <div className="flex-1 w-full rounded-2xl overflow-hidden border border-[#29C3FF]/30">
             <iframe
               title="Dozers Grill Map"
               src="https://www.google.com/maps?q=Dozers+Grill+Mesa+AZ&hl=en&z=15&output=embed"
@@ -296,58 +245,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* REVIEWS */}
-      <section className="py-24 px-6 md:px-20 text-center border-t border-[#29C3FF]/30 bg-[#0d1117]/80 backdrop-blur-md">
-        <h2 className="text-4xl font-[Playfair_Display] text-white mb-10 drop-shadow-[0_0_25px_rgba(41,195,255,0.5)]">
-          Top Customer Reviews
-        </h2>
-
-        {loadingReviews ? (
-          <p className="text-gray-400">Loading reviews...</p>
-        ) : fourAndFiveStarReviews.length === 0 ? (
-          <p className="text-gray-500 text-sm">No top reviews yet</p>
-        ) : (
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {fourAndFiveStarReviews.map((r, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="bg-[#111827]/70 border border-[#29C3FF]/20 rounded-2xl p-6 shadow-[0_0_25px_-5px_rgba(41,195,255,0.3)]"
-              >
-                <div className="flex flex-col items-center mb-3">
-                  {r.profile && (
-                    <img
-                      src={r.profile}
-                      alt={r.author}
-                      className="w-10 h-10 rounded-full border border-[#29C3FF]/40 mb-2"
-                    />
-                  )}
-                  <p className="text-[#29C3FF] font-semibold">{r.author}</p>
-                  {r.time && <p className="text-gray-500 text-xs">{r.time}</p>}
-                </div>
-
-                <div className="flex justify-center text-[#F59E0B] mb-3 text-sm">
-                  {"★".repeat(Number(r.rating))}
-                </div>
-
-                <p className="text-gray-300 italic leading-relaxed">
-                  “{r.text}”
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* FOOTER */}
       <footer className="py-6 px-6 md:px-10 border-t border-[#29C3FF]/30 bg-[#0d1117]/80 backdrop-blur-md text-center text-gray-400">
         © 2025 Dozers Grill • All Rights Reserved
       </footer>
     </div>
   );
 }
+
 
 
 
