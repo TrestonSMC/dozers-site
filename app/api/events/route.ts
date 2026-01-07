@@ -3,26 +3,11 @@ import ical from "ical";
 
 export const dynamic = "force-dynamic";
 
-// YOUR ICS FEED (events feed)
+// 7shifts ICS feed
 const ICS_URL =
   "https://app.7shifts.com/page/calendar/events/389947/85956d78425eba68b8843bedc8ecbf98";
 
-// Keep only REAL public events
-const KEEP_KEYWORDS = [
-  "apa",
-  "bca",
-  "upl",
-  "chip",
-  "tourn",
-  "league",
-  "singles",
-  "double",
-  "9 ball",
-  "8 ball",
-  "pool"
-];
-
-// Remove staff-only items
+// Block staff-only / internal items
 const BLOCK_KEYWORDS = [
   "work anniversary",
   "anniversary",
@@ -61,16 +46,10 @@ export async function GET() {
       // ❌ Block employee names
       if (isEmployeeName(title)) continue;
 
-      // ❌ Block anniversaries, birthdays, staff meetings
+      // ❌ Block staff / internal keywords
       if (BLOCK_KEYWORDS.some((word) => lower.includes(word))) continue;
 
-      // Only include REAL customer events
-      const isRealEvent = KEEP_KEYWORDS.some((word) =>
-        lower.includes(word)
-      );
-      if (!isRealEvent) continue;
-
-      // Safe date parsing
+      // ❌ Must have a valid start date
       if (!ev.start) continue;
       const start = new Date(ev.start as any);
       if (isNaN(start.getTime())) continue;
@@ -90,7 +69,7 @@ export async function GET() {
       });
     }
 
-    // Sort
+    // Sort by date
     events.sort(
       (a, b) => new Date(a.rawDate).getTime() - new Date(b.rawDate).getTime()
     );
