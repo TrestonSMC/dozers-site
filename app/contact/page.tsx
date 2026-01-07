@@ -71,7 +71,7 @@ export default function ContactPage() {
 
           <div className="text-center text-lg text-gray-300 mb-10">
             <p>7012 E Hampton Ave, Mesa, AZ 85209</p>
-            <p className="mt-2">(480) 463-3367</p>
+            <p className="mt-2">(602) 694-5551</p>
             <p className="mt-2 font-medium text-white">Open Daily: 10 AM – 2 AM</p>
             <p className="mt-1 text-gray-400 text-sm">
               Kitchen Hours: Mon–Thurs 4pm–10pm • Fri–Sun 10am–10pm
