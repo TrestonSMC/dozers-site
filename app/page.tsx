@@ -102,7 +102,7 @@ export default function Home() {
 
       <div className="fixed inset-0 bg-gradient-to-b from-transparent via-[#0d1117]/40 to-[#0d1117]/90 z-0" />
 
-      {/* Header */}
+      {/* HEADER */}
       <header className="fixed top-0 left-0 w-full flex justify-between items-center px-8 py-5 z-50 backdrop-blur-md bg-[#0d1117]/70 border-b border-[#29C3FF]/20">
         <Image
           src="/images/dozers-logo.png"
@@ -138,50 +138,138 @@ export default function Home() {
         )}
       </header>
 
+      {/* HERO */}
+      <section className="relative min-h-screen flex flex-col justify-center items-center text-center px-4 z-10">
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0d1117]/70 via-transparent to-transparent z-0" />
+        <h1 className="text-5xl md:text-7xl font-[Playfair_Display] font-bold text-white drop-shadow-[0_0_35px_rgba(245,158,11,0.6)] z-10">
+          Welcome to Dozers Grill
+        </h1>
+        <p className="text-gray-300 mt-6 text-lg md:text-xl max-w-2xl z-10">
+          Great food, good company, and the best pool in town.
+          <br /> Open daily until 2 AM.
+        </p>
+        <div className="mt-10 z-10">
+          <Link href="/menu">
+            <Button className="border-0 text-white bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-10 py-5 rounded-full text-lg tracking-wider hover:scale-105 transition-transform">
+              View Menu
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* EXPERIENCE */}
+      <section className="relative py-24 px-6 md:px-20 flex flex-col md:flex-row items-center gap-10 border-t border-[#10B981]/20 bg-[#111827]/70 backdrop-blur-md">
+        <div className="flex-1 text-center md:text-left">
+          <h2 className="text-4xl font-[Playfair_Display] mb-6 text-white">
+            The Experience
+          </h2>
+          <p className="text-gray-300 text-lg mb-8">
+            Step into a world where precision meets atmosphere.
+          </p>
+
+          <Link href="/gallery">
+            <Button className="bg-gradient-to-r from-[#10B981] to-[#29C3FF] px-8 py-4 rounded-full">
+              View Photo Gallery
+            </Button>
+          </Link>
+        </div>
+
+        <div className="flex-1">
+          <video
+            ref={videoRef}
+            loop
+            playsInline
+            preload="auto"
+            className="w-full rounded-lg cursor-pointer"
+            onClick={toggleVideo}
+          >
+            <source src={`${supabaseBase}/experience.mp4`} type="video/mp4" />
+          </video>
+        </div>
+      </section>
+
+      {/* EVENTS */}
+      <section className="py-24 px-6 md:px-20 text-center border-t border-[#29C3FF]/20 bg-[#111827]/80">
+        <h2 className="text-4xl font-[Playfair_Display] text-white mb-10">
+          Upcoming Events
+        </h2>
+
+        <div className="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto mb-16">
+          {events.slice(0, 3).map((event, i) => {
+            const color = eventColors[i % eventColors.length];
+            return (
+              <motion.div
+                key={event.id}
+                className="p-8 rounded-xl border"
+                style={{ borderColor: `${color}40` }}
+              >
+                <h3 className="text-2xl font-semibold" style={{ color }}>
+                  {event.title}
+                </h3>
+                <p className="text-gray-400">{event.time}</p>
+                <p className="text-gray-300">{event.desc}</p>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        <Link href="/events">
+          <Button className="bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-10 py-4 rounded-full">
+            View All Events
+          </Button>
+        </Link>
+      </section>
+
       {/* LOCATION */}
       <section
         id="contact"
-        className="py-24 px-6 md:px-20 border-t border-[#F59E0B]/20 bg-[#111827]/70 backdrop-blur-md"
+        className="py-24 px-6 md:px-20 border-t border-[#F59E0B]/20 bg-[#111827]/70"
       >
         <div className="flex flex-col md:flex-row items-center gap-10 max-w-6xl mx-auto">
           <div className="flex-1 text-center md:text-left">
-            <h2 className="text-4xl font-[Playfair_Display] mb-6 text-white drop-shadow-[0_0_25px_rgba(245,158,11,0.4)]">
+            <h2 className="text-4xl font-[Playfair_Display] mb-6 text-white">
               Visit Dozers Grill
             </h2>
             <p className="text-gray-300 mb-2 text-lg">
               7012 E Hampton Ave, Mesa, AZ 85209
             </p>
-            <p className="text-gray-300 mb-2 text-lg">(602) 694-5551</p>
-            <p className="text-gray-300 mb-4 text-lg">
-              Open Daily • 10 AM – 2 AM
-            </p>
-            <p className="text-gray-400 mb-8 text-sm">
-              Kitchen: Mon–Thurs 4pm–10pm, Fri–Sun 10am–10pm
-            </p>
 
-            {/* ✅ ONLY CHANGE IS HERE */}
+            {/* ✅ ONLY CHANGE */}
             <Link href="/contact">
-              <Button className="border-0 text-white bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-8 py-4 rounded-full hover:scale-105 transition-transform">
+              <Button className="bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-8 py-4 rounded-full">
                 Get Directions
               </Button>
             </Link>
           </div>
-
-          <div className="flex-1 w-full rounded-2xl overflow-hidden border border-[#29C3FF]/30 shadow-[0_0_25px_-5px_rgba(41,195,255,0.4)]">
-            <iframe
-              title="Dozers Grill Map"
-              src="https://www.google.com/maps?q=Dozers+Grill+Mesa+AZ&hl=en&z=15&output=embed"
-              width="100%"
-              height="400"
-              style={{ border: 0 }}
-              loading="lazy"
-            ></iframe>
-          </div>
         </div>
       </section>
+
+      {/* REVIEWS */}
+      <section className="py-24 px-6 md:px-20 text-center border-t border-[#29C3FF]/30 bg-[#0d1117]/80">
+        <h2 className="text-4xl font-[Playfair_Display] text-white mb-10">
+          Top Customer Reviews
+        </h2>
+
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {fourAndFiveStarReviews.map((r, i) => (
+            <motion.div key={i} className="p-6 border rounded-2xl">
+              <p className="text-[#29C3FF] font-semibold">{r.author}</p>
+              <div className="text-[#F59E0B]">
+                {"★".repeat(Number(r.rating))}
+              </div>
+              <p className="text-gray-300 italic">“{r.text}”</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      <footer className="py-6 text-center text-gray-400">
+        © 2025 Dozers Grill • All Rights Reserved
+      </footer>
     </div>
   );
 }
+
 
 
 
