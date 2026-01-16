@@ -147,7 +147,7 @@ export default function Home() {
           Welcome to Dozers Grill
         </h1>
         <p className="text-gray-300 mt-6 text-lg md:text-xl max-w-2xl z-10">
-          Great food, good company, and the best pool in town.
+          Great food, cold drinks, and good company.
           <br /> Open daily until 2 AM.
         </p>
         <div className="mt-10 z-10">
@@ -169,8 +169,7 @@ export default function Home() {
             The Experience
           </h2>
           <p className="text-gray-300 text-lg leading-relaxed mb-8">
-            Step into a world where precision meets atmosphere. Our modern tables, ambient lighting,
-            and handcrafted cocktails make every visit unforgettable.
+            Step into Dozers Grill, a full-service restaurant and bar where great food, drink specials, and handcrafted cocktails set the stage. Paired with a vibrant atmosphere, weekly events, and recurring nights, every visit feels familiar — and never the same.
           </p>
 
           <Link href="/gallery">
