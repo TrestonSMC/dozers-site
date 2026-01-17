@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,18 +13,18 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// ✅ Fully updated metadata (Next.js 15 compatible)
+// ✅ Metadata
 export const metadata: Metadata = {
   title: "Dozers Grill | Food • Drinks • Events • Mesa, AZ",
   description:
-    "Official website for Dozers Grill in Mesa, AZ — great food, drinks, atmosphere, daily tournaments, and events.",
+    "Official website for Dozers Grill in Mesa, AZ — great food, drinks, atmosphere, and weekly events.",
   keywords:
-    "Dozers Grill, Mesa AZ, Food, Bar, Restaurant, Pool Hall, Events, Tournaments",
+    "Dozers Grill, Mesa AZ, Restaurant, Bar, Food, Drinks, Events",
 
   openGraph: {
     title: "Dozers Grill | Mesa, AZ",
     description:
-      "Great food, drinks, and daily events at Dozers Grill in Mesa, AZ.",
+      "Great food, drinks, and weekly events at Dozers Grill in Mesa, AZ.",
     url: "https://dozersgrill.com",
     siteName: "Dozers Grill",
     images: [
@@ -41,7 +42,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Dozers Grill | Mesa, AZ",
     description:
-      "Visit Dozers Grill — great food, drinks, tournaments, and a fun atmosphere.",
+      "Visit Dozers Grill — great food, drinks, and a fun atmosphere.",
     images: [
       "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/gallery/gallery1.png",
     ],
@@ -56,11 +57,29 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
+      <head>
+        {/* ✅ Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-XXXXXXXXXX', {
+              page_path: window.location.pathname,
+            });
+          `}
+        </Script>
+      </head>
+
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -69,4 +88,5 @@ export default function RootLayout({
     </html>
   );
 }
+
 
