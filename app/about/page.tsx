@@ -11,7 +11,6 @@ export default function AboutPage() {
 
   return (
     <div className="relative bg-[#0d1117] text-gray-100 overflow-x-hidden">
-
       {/* ======================= BACKGROUND VIDEO ======================= */}
       <video
         autoPlay
@@ -56,8 +55,9 @@ export default function AboutPage() {
         </h1>
 
         <p className="text-gray-300 mt-6 text-lg md:text-xl max-w-2xl">
-          28 Diamond Tables, 5 Electronic Dart Boards, and a variety of events,
-          leagues, and tournaments 7 days a week!
+          Great food, cold drinks, and a packed weekly lineup — plus 22 Diamond
+          tables, 5 electronic dart boards, leagues, tournaments, and events 7
+          days a week!
         </p>
 
         <Link href="/events" className="mt-10">
@@ -85,10 +85,10 @@ export default function AboutPage() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-gray-300 text-lg leading-relaxed max-w-3xl mx-auto"
           >
-            Dozers Grill isn’t just a bar — it’s a local hangout built for
-            friends, families, and serious players alike. Whether you’re here to
-            unwind with a drink, catch a game, or compete on the tables,
-            we’ve created a space for you.
+            Dozers Grill is a neighborhood bar &amp; restaurant built for good
+            meals, cold drinks, and easy nights with friends and family. Catch a
+            game, hang at the bar, or jump into the action with darts and our
+            Diamond tables — we’ve created a space for everyone.
           </motion.p>
         </div>
 
@@ -116,13 +116,13 @@ export default function AboutPage() {
             className="text-gray-300 text-lg leading-relaxed"
           >
             <p className="mb-6">
-              From leagues and live music to tournaments and special events,
-              Dozers is your destination for fun — all week long. With
-              28 Diamond pool tables, 5 electronic dart boards, and a lineup of
-              entertainment, there's always something happening.
+              From live music and specials to leagues, tournaments, and themed
+              nights, Dozers is your go-to spot all week long. Enjoy a full bar,
+              great food, and plenty to do — with 22 Diamond tables, 5 electronic
+              dart boards, and nonstop entertainment.
             </p>
             <p className="text-gray-400 italic">
-              “Come for the competition, stay for the community.”
+              “Come for the food &amp; drinks, stay for the community.”
             </p>
           </motion.div>
         </div>
@@ -141,7 +141,6 @@ export default function AboutPage() {
               rates: [
                 { label: "7FT", value: "$6" },
                 { label: "9FT", value: "$7" },
-                { label: "PIT", value: "$15" },
               ],
             },
             {
@@ -149,7 +148,6 @@ export default function AboutPage() {
               rates: [
                 { label: "7FT", value: "$12" },
                 { label: "9FT", value: "$15" },
-                { label: "PIT", value: "$20" },
               ],
             },
             {
@@ -157,7 +155,6 @@ export default function AboutPage() {
               rates: [
                 { label: "7FT", value: "$12" },
                 { label: "9FT", value: "$15" },
-                { label: "PIT", value: "$20" },
               ],
             },
           ].map((rate, i) => (
@@ -212,3 +209,4 @@ export default function AboutPage() {
     </div>
   );
 }
+
