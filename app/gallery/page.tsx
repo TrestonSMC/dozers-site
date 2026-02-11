@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,8 +10,9 @@ export default function GalleryPage() {
   const [images, setImages] = useState<string[]>([]);
   const [current, setCurrent] = useState(0);
   const [glowColor, setGlowColor] = useState("#29C3FF");
+  const [loading, setLoading] = useState(true);
 
-  // 🪣 Supabase public gallery folder
+  // 🪣 Supabase public gallery folder (used only to DISPLAY images after we get filenames)
   const supabaseBase =
     "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/gallery";
 
@@ -22,12 +23,35 @@ export default function GalleryPage() {
   // 🌈 Glow palette
   const glowPalette = ["#29C3FF", "#F59E0B", "#8B5CF6", "#10B981"];
 
+  // ✅ Cache-bust once per load (not every render)
+  const cacheBuster = useMemo(() => `?v=${Date.now()}`, []);
+
   useEffect(() => {
-    // Only 4 photos
-    setImages(["gallery1.png", "gallery2.png", "gallery3.png", "gallery4.png"]);
+    const loadGallery = async () => {
+      try {
+        const res = await fetch("/api/gallery", { cache: "no-store" });
+        const data = await res.json();
+
+        const list = Array.isArray(data?.images) ? data.images : [];
+        setImages(list);
+
+        // reset state when new list arrives
+        setCurrent(0);
+        setGlowColor(glowPalette[0]);
+      } catch {
+        setImages([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadGallery();
   }, []);
 
+  const hasImages = images.length > 0;
+
   const nextImage = () => {
+    if (!hasImages) return;
     setCurrent((prev) => {
       const next = prev === images.length - 1 ? 0 : prev + 1;
       setGlowColor(glowPalette[next % glowPalette.length]);
@@ -36,14 +60,13 @@ export default function GalleryPage() {
   };
 
   const prevImage = () => {
+    if (!hasImages) return;
     setCurrent((prev) => {
       const next = prev === 0 ? images.length - 1 : prev - 1;
       setGlowColor(glowPalette[next % glowPalette.length]);
       return next;
     });
   };
-
-  const cacheBuster = `?v=${Date.now()}`;
 
   return (
     <div className="relative bg-[#0d1117] text-gray-100 min-h-screen overflow-hidden flex flex-col">
@@ -85,8 +108,8 @@ export default function GalleryPage() {
           The Gallery
         </h1>
         <p className="text-gray-300 text-lg leading-relaxed mt-6 max-w-2xl mx-auto px-6">
-          A glimpse inside Dozers Grill — the food, the games, and the nightlife. Explore the
-          atmosphere that makes Dozers a true experience.
+          A glimpse inside Dozers Grill — the food, the games, and the nightlife.
+          Explore the atmosphere that makes Dozers a true experience.
         </p>
       </section>
 
@@ -108,35 +131,51 @@ export default function GalleryPage() {
             transition: "box-shadow 0.6s ease-in-out",
           }}
         >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={current}
-              initial={{ opacity: 0, scale: 1.02 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.4 }}
-              className="absolute inset-0"
-            >
-              <Image
-                src={`${supabaseBase}/${images[current]}${cacheBuster}`}
-                alt={`Gallery image ${current + 1}`}
-                fill
-                priority
-                className="object-cover rounded-2xl"
-              />
-            </motion.div>
-          </AnimatePresence>
+          {loading ? (
+            <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+              Loading gallery...
+            </div>
+          ) : !hasImages ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500 px-6 text-center">
+              <p className="text-base">No photos yet.</p>
+              <p className="text-sm mt-2">
+                Upload images to Supabase Storage:
+                <span className="text-gray-300"> dozers-gallery / gallery</span>
+              </p>
+            </div>
+          ) : (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={current}
+                initial={{ opacity: 0, scale: 1.02 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.4 }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={`${supabaseBase}/${images[current]}${cacheBuster}`}
+                  alt={`Gallery image ${current + 1}`}
+                  fill
+                  priority
+                  className="object-cover rounded-2xl"
+                />
+              </motion.div>
+            </AnimatePresence>
+          )}
 
           {/* Arrows */}
           <button
             onClick={prevImage}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-3 rounded-full backdrop-blur-sm transition"
+            disabled={!hasImages}
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 disabled:opacity-40 disabled:cursor-not-allowed text-white p-3 rounded-full backdrop-blur-sm transition"
           >
             <ChevronLeft size={28} />
           </button>
           <button
             onClick={nextImage}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-3 rounded-full backdrop-blur-sm transition"
+            disabled={!hasImages}
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 disabled:opacity-40 disabled:cursor-not-allowed text-white p-3 rounded-full backdrop-blur-sm transition"
           >
             <ChevronRight size={28} />
           </button>
@@ -148,7 +187,7 @@ export default function GalleryPage() {
         <div className="flex justify-center flex-wrap gap-4 max-w-5xl mx-auto">
           {images.map((img, i) => (
             <motion.button
-              key={i}
+              key={img}
               onClick={() => {
                 setCurrent(i);
                 setGlowColor(glowPalette[i % glowPalette.length]);
@@ -179,6 +218,8 @@ export default function GalleryPage() {
     </div>
   );
 }
+
+
 
 
 
