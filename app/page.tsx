@@ -281,10 +281,9 @@ export default function Home() {
               7012 E Hampton Ave, Mesa, AZ 85209
             </p>
             <p className="text-gray-300 mb-2 text-lg">(602) 694-5551</p>
-            <p className="text-gray-300 mb-4 text-lg">
-              Open Daily • 10 AM – 2 AM
-            </p>
-            <p className="text-gray-400 mb-8 text-sm">Kitchen: 10 AM – 10 PM (Daily)</p>
+           <p className="text-gray-400 mb-8 text-sm">
+           Kitchen: Sun–Thurs 10 AM – 10 PM • Fri–Sat 10 AM – 12 AM
+             </p>
             <Button className="border-0 text-white bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-8 py-4 rounded-full hover:scale-105 transition-transform">
               Get Directions
             </Button>
