@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
@@ -57,8 +57,10 @@ export default function Home() {
 
         // ⭐ Sort future events by date
         upcoming.sort(
-          (a: { rawDate: string | number | Date; }, b: { rawDate: string | number | Date; }) =>
-            new Date(a.rawDate).getTime() - new Date(b.rawDate).getTime()
+          (
+            a: { rawDate: string | number | Date },
+            b: { rawDate: string | number | Date }
+          ) => new Date(a.rawDate).getTime() - new Date(b.rawDate).getTime()
         );
 
         setEvents(upcoming);
@@ -169,7 +171,10 @@ export default function Home() {
             The Experience
           </h2>
           <p className="text-gray-300 text-lg leading-relaxed mb-8">
-            Step into Dozers Grill, a full-service restaurant and bar where great food, drink specials, and handcrafted cocktails set the stage. Paired with a vibrant atmosphere, weekly events, and recurring nights, every visit feels familiar — and never the same.
+            Step into Dozers Grill, a full-service restaurant and bar where
+            great food, drink specials, and handcrafted cocktails set the stage.
+            Paired with a vibrant atmosphere, weekly events, and recurring
+            nights, every visit feels familiar — and never the same.
           </p>
 
           <Link href="/gallery">
@@ -244,7 +249,9 @@ export default function Home() {
                       {event.title}
                     </h3>
                     <p className="text-gray-400 mb-3 text-sm">{event.time}</p>
-                    <p className="text-gray-300 text-base leading-relaxed">{event.desc}</p>
+                    <p className="text-gray-300 text-base leading-relaxed">
+                      {event.desc}
+                    </p>
                   </motion.div>
                 );
               })}
@@ -270,12 +277,14 @@ export default function Home() {
             <h2 className="text-4xl font-[Playfair_Display] mb-6 text-white drop-shadow-[0_0_25px_rgba(245,158,11,0.4)]">
               Visit Dozers Grill
             </h2>
-            <p className="text-gray-300 mb-2 text-lg">7012 E Hampton Ave, Mesa, AZ 85209</p>
-            <p className="text-gray-300 mb-2 text-lg">(602) 694-5551</p>
-            <p className="text-gray-300 mb-4 text-lg">Open Daily • 10 AM – 2 AM</p>
-            <p className="text-gray-400 mb-8 text-sm">
-              Kitchen: Mon–Thurs 4pm–10pm, Fri–Sun 10am–10pm
+            <p className="text-gray-300 mb-2 text-lg">
+              7012 E Hampton Ave, Mesa, AZ 85209
             </p>
+            <p className="text-gray-300 mb-2 text-lg">(602) 694-5551</p>
+            <p className="text-gray-300 mb-4 text-lg">
+              Open Daily • 10 AM – 2 AM
+            </p>
+            <p className="text-gray-400 mb-8 text-sm">Kitchen: 10 AM – 10 PM (Daily)</p>
             <Button className="border-0 text-white bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-8 py-4 rounded-full hover:scale-105 transition-transform">
               Get Directions
             </Button>
@@ -331,9 +340,7 @@ export default function Home() {
                   {"★".repeat(Number(r.rating))}
                 </div>
 
-                <p className="text-gray-300 italic leading-relaxed">
-                  “{r.text}”
-                </p>
+                <p className="text-gray-300 italic leading-relaxed">“{r.text}”</p>
               </motion.div>
             ))}
           </div>
@@ -346,7 +353,8 @@ export default function Home() {
       </footer>
     </div>
   );
-} 
+}
+
 
 
 
