@@ -489,8 +489,7 @@ export default function SubmitEventPage() {
               </div>
 
               <p className="mt-4 text-xs text-white/35">
-                Office Use Only fields can be added later (internal approval,
-                pricing, or staff notes).
+                Submitted events are reviewed and approved by Dozers staff.
               </p>
             </div>
           </form>
