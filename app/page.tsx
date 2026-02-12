@@ -171,10 +171,10 @@ export default function Home() {
             The Experience
           </h2>
           <p className="text-gray-300 text-lg leading-relaxed mb-8">
-            Step into Dozers Grill, a full-service restaurant and bar where
-            great food, drink specials, and handcrafted cocktails set the stage.
-            Paired with a vibrant atmosphere, weekly events, and recurring
-            nights, every visit feels familiar — and never the same.
+            Step into Dozers Grill, a full-service restaurant and bar where great
+            food, drink specials, and handcrafted cocktails set the stage. Paired
+            with a vibrant atmosphere, weekly events, and recurring nights, every
+            visit feels familiar — and never the same.
           </p>
 
           <Link href="/gallery">
@@ -257,12 +257,22 @@ export default function Home() {
               })}
             </div>
 
-            {/* VIEW ALL EVENTS BUTTON */}
-            <Link href="/events">
-              <Button className="border-0 text-white bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-10 py-4 rounded-full text-lg tracking-wider hover:scale-105 transition-transform">
-                View All Events
-              </Button>
-            </Link>
+            {/* BUTTONS */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+              {/* VIEW ALL EVENTS */}
+              <Link href="/events">
+                <Button className="border-0 text-white bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-10 py-4 rounded-full text-lg tracking-wider hover:scale-105 transition-transform">
+                  View All Events
+                </Button>
+              </Link>
+
+              {/* SUBMIT EVENT */}
+              <Link href="/submit-event">
+                <Button className="border border-[#10B981] text-[#10B981] bg-transparent px-10 py-4 rounded-full text-lg tracking-wider hover:bg-[#10B981]/10 hover:scale-105 transition-transform shadow-[0_0_20px_-5px_rgba(16,185,129,0.6)]">
+                  Submit an Event
+                </Button>
+              </Link>
+            </div>
           </>
         )}
       </section>
@@ -281,9 +291,10 @@ export default function Home() {
               7012 E Hampton Ave, Mesa, AZ 85209
             </p>
             <p className="text-gray-300 mb-2 text-lg">(602) 694-5551</p>
-           <p className="text-gray-400 mb-8 text-sm">
-           Kitchen: Sun–Thurs 10 AM – 10 PM • Fri–Sat 10 AM – 12 AM
-             </p>
+            <p className="text-gray-400 mb-8 text-sm">
+              Kitchen: Sun–Thurs 10 AM – 10 PM • Fri–Sat 10 AM – 12 AM
+            </p>
+
             <Button className="border-0 text-white bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-8 py-4 rounded-full hover:scale-105 transition-transform">
               Get Directions
             </Button>
@@ -353,6 +364,7 @@ export default function Home() {
     </div>
   );
 }
+
 
 
 
