@@ -18,13 +18,11 @@ export const metadata: Metadata = {
   title: "Dozers Grill | Food • Drinks • Events • Mesa, AZ",
   description:
     "Official website for Dozers Grill in Mesa, AZ — great food, drinks, atmosphere, and weekly events.",
-  keywords:
-    "Dozers Grill, Mesa AZ, Restaurant, Bar, Food, Drinks, Events",
+  keywords: "Dozers Grill, Mesa AZ, Restaurant, Bar, Food, Drinks, Events",
 
   openGraph: {
     title: "Dozers Grill | Mesa, AZ",
-    description:
-      "Great food, drinks, and weekly events at Dozers Grill in Mesa, AZ.",
+    description: "Great food, drinks, and weekly events at Dozers Grill in Mesa, AZ.",
     url: "https://dozersgrill.com",
     siteName: "Dozers Grill",
     images: [
@@ -41,18 +39,20 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Dozers Grill | Mesa, AZ",
-    description:
-      "Visit Dozers Grill — great food, drinks, and a fun atmosphere.",
+    description: "Visit Dozers Grill — great food, drinks, and a fun atmosphere.",
     images: [
       "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-gallery/gallery/gallery1.png",
     ],
   },
 
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
-  },
+  /**
+   * ✅ IMPORTANT:
+   * Do NOT set `icons` here when using App Router if you already have:
+   *   app/icon.png
+   * Next will automatically generate the proper <link rel="icon" ...> tags.
+   * Setting icons manually can cause browsers to fall back to the globe if caching
+   * or path resolution acts up.
+   */
 };
 
 export default function RootLayout({
@@ -65,8 +65,7 @@ export default function RootLayout({
       <head>
         {/* ✅ Google Analytics */}
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-GRW9K2620D
-"
+          src="https://www.googletagmanager.com/gtag/js?id=G-GRW9K2620D"
           strategy="afterInteractive"
         />
         <Script id="google-analytics" strategy="afterInteractive">
@@ -81,9 +80,7 @@ export default function RootLayout({
         </Script>
       </head>
 
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
     </html>

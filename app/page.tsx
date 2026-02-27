@@ -357,17 +357,33 @@ export default function Home() {
         )}
       </section>
 
-      {/* FOOTER */}
-      <footer className="py-6 px-6 md:px-10 border-t border-[#29C3FF]/30 bg-[#0d1117]/80 backdrop-blur-md text-center text-gray-400">
-        © 2025 Dozers Grill • All Rights Reserved
+      {/* FOOTER (UPDATED: Privacy + SMS Terms links) */}
+      <footer className="py-8 px-6 md:px-10 border-t border-[#29C3FF]/30 bg-[#0d1117]/80 backdrop-blur-md text-center text-gray-400 text-sm">
+        <div className="space-y-3">
+          <p>© 2025 Dozers Grill • All Rights Reserved</p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-[#29C3FF]">
+            <Link
+              href="/privacy-policy"
+              className="hover:text-[#F59E0B] underline underline-offset-4 transition"
+            >
+              Privacy Policy
+            </Link>
+
+            <span className="hidden sm:block text-gray-500">|</span>
+
+            <Link
+              href="/sms-terms-and-conditions"
+              className="hover:text-[#F59E0B] underline underline-offset-4 transition"
+            >
+              SMS Terms & Conditions
+            </Link>
+          </div>
+        </div>
       </footer>
     </div>
   );
 }
-
-
-
-
 
 
 
