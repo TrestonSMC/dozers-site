@@ -1,3 +1,8 @@
+// ✅ FILE 3: app/page.tsx (YOUR HOME PAGE)
+// Replace your current home page with this.
+// Only change from your latest: it now imports INSIDER_POSTS from lib/dozers-insider.ts
+// and maps those, so you NEVER touch homepage again to add posts.
+
 "use client";
 
 import { useRef, useState, useEffect } from "react";
@@ -5,6 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { INSIDER_POSTS } from "@/lib/dozers-insider";
 
 export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -90,8 +96,33 @@ export default function Home() {
   // ⭐ Colors to rotate for event cards
   const eventColors = ["#29C3FF", "#F59E0B", "#10B981"];
 
+  // ⭐ Slider refs
+  const insiderScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollInsider = (dir: "left" | "right") => {
+    const el = insiderScrollRef.current;
+    if (!el) return;
+
+    const amount = Math.max(280, Math.floor(el.clientWidth * 0.75));
+    el.scrollBy({
+      left: dir === "left" ? -amount : amount,
+      behavior: "smooth",
+    });
+  };
+
   return (
     <div className="relative bg-[#0d1117] text-gray-100 overflow-x-hidden">
+      {/* Hide scrollbar ONLY for the insider scroller (safe, no side effects) */}
+      <style>{`
+        .dozers-insider-scroll {
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none; /* IE/Edge */
+        }
+        .dozers-insider-scroll::-webkit-scrollbar {
+          display: none; /* Chrome/Safari */
+        }
+      `}</style>
+
       {/* Background video */}
       <video
         autoPlay
@@ -170,12 +201,12 @@ export default function Home() {
           <h2 className="text-4xl font-[Playfair_Display] mb-6 text-white drop-shadow-[0_0_25px_rgba(16,185,129,0.4)]">
             The Experience
           </h2>
-          <p className="text-gray-300 text-lg leading-relaxed mb-8">
-            Step into Dozers Grill, a full-service restaurant and bar where great
-            food, drink specials, and handcrafted cocktails set the stage. Paired
-            with a vibrant atmosphere, weekly events, and recurring nights, every
-            visit feels familiar — and never the same.
-          </p>
+         <p className="text-gray-300 text-lg leading-relaxed mb-8">
+  Step into Dozers Grill, a full-service restaurant and bar where great
+  food, drink specials, and handcrafted cocktails set the stage. Paired
+  with a vibrant atmosphere, weekly events, and recurring nights, every
+  visit feels familiar — and never the same.
+</p>
 
           <Link href="/gallery">
             <Button className="border-0 text-white bg-gradient-to-r from-[#10B981] to-[#29C3FF] px-8 py-4 rounded-full text-lg tracking-wider hover:scale-105 transition-transform shadow-[0_0_25px_-5px_rgba(16,185,129,0.6)]">
@@ -257,16 +288,13 @@ export default function Home() {
               })}
             </div>
 
-            {/* BUTTONS */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              {/* VIEW ALL EVENTS */}
               <Link href="/events">
                 <Button className="border-0 text-white bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-10 py-4 rounded-full text-lg tracking-wider hover:scale-105 transition-transform">
                   View All Events
                 </Button>
               </Link>
 
-              {/* SUBMIT EVENT */}
               <Link href="/submit-event">
                 <Button className="border border-[#10B981] text-[#10B981] bg-transparent px-10 py-4 rounded-full text-lg tracking-wider hover:bg-[#10B981]/10 hover:scale-105 transition-transform shadow-[0_0_20px_-5px_rgba(16,185,129,0.6)]">
                   Submit an Event
@@ -300,7 +328,6 @@ export default function Home() {
             </Button>
           </div>
 
-          {/* Map */}
           <div className="flex-1 w-full rounded-2xl overflow-hidden border border-[#29C3FF]/30 shadow-[0_0_25px_-5px_rgba(41,195,255,0.4)]">
             <iframe
               title="Dozers Grill Map"
@@ -357,7 +384,76 @@ export default function Home() {
         )}
       </section>
 
-      {/* FOOTER (UPDATED: Privacy + SMS Terms links) */}
+{/* DOZERS INSIDER (clean edge-bleed, no see-through) */}
+<section className="py-20 px-6 md:px-20 border-t border-[#10B981]/20 bg-[#111827]/70 backdrop-blur-md overflow-hidden">
+  <div className="max-w-6xl mx-auto">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-10">
+      <div className="text-left">
+        <h2 className="text-4xl font-[Playfair_Display] text-white drop-shadow-[0_0_25px_rgba(16,185,129,0.45)]">
+          Dozers Insider
+        </h2>
+        <p className="text-gray-300 mt-2 text-sm">
+          Local guides, food highlights, and what&apos;s going on at Dozers.
+        </p>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => scrollInsider("left")}
+          aria-label="Scroll left"
+          className="h-11 w-11 rounded-full border border-[#10B981]/30 bg-[#0d1117]/50 hover:bg-[#10B981]/10 transition shadow-[0_0_18px_-8px_rgba(16,185,129,0.6)] flex items-center justify-center"
+        >
+          <span className="text-white text-xl">‹</span>
+        </button>
+        <button
+          onClick={() => scrollInsider("right")}
+          aria-label="Scroll right"
+          className="h-11 w-11 rounded-full border border-[#10B981]/30 bg-[#0d1117]/50 hover:bg-[#10B981]/10 transition shadow-[0_0_18px_-8px_rgba(16,185,129,0.6)] flex items-center justify-center"
+        >
+          <span className="text-white text-xl">›</span>
+        </button>
+      </div>
+    </div>
+
+    {/* edge bleed scroller */}
+    <div className="relative -mx-6 md:-mx-20">
+      {/* solid fades so you never see the background video through the edges */}
+      <div className="pointer-events-none absolute left-0 top-0 h-full w-14 z-10 bg-gradient-to-r from-[#111827] via-[#111827] to-transparent" />
+      <div className="pointer-events-none absolute right-0 top-0 h-full w-14 z-10 bg-gradient-to-l from-[#111827] via-[#111827] to-transparent" />
+
+      <div
+        ref={insiderScrollRef}
+        className="dozers-insider-scroll flex gap-6 overflow-x-auto scroll-smooth pb-4 px-6 md:px-20"
+      >
+        {INSIDER_POSTS.map((post, i) => (
+          <motion.div
+            key={post.href}
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: i * 0.06 }}
+            className="min-w-[280px] sm:min-w-[340px] md:min-w-[380px] p-7 rounded-2xl border border-[#10B981]/20 bg-[#1a1f2a]/70 backdrop-blur-md text-left shadow-[0_0_25px_-8px_rgba(16,185,129,0.45)] hover:scale-[1.02] transition-transform"
+          >
+            <h3 className="text-xl font-semibold text-white mb-2">
+              {post.title}
+            </h3>
+            <p className="text-gray-300 text-sm leading-relaxed mb-5">
+              {post.desc}
+            </p>
+
+            <Link
+              href={post.href}
+              className="inline-flex items-center gap-2 text-[#29C3FF] hover:text-[#F59E0B] transition font-semibold"
+            >
+              Read more <span aria-hidden>→</span>
+            </Link>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+      {/* FOOTER */}
       <footer className="py-8 px-6 md:px-10 border-t border-[#29C3FF]/30 bg-[#0d1117]/80 backdrop-blur-md text-center text-gray-400 text-sm">
         <div className="space-y-3">
           <p>© 2025 Dozers Grill • All Rights Reserved</p>
@@ -384,9 +480,6 @@ export default function Home() {
     </div>
   );
 }
-
-
-
 
 
 
