@@ -1,79 +1,121 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
 const eventColors = ["#29C3FF", "#F59E0B", "#10B981", "#EC4899", "#3B82F6", "#F97316"];
+
+function pad2(n: number) {
+  return String(n).padStart(2, "0");
+}
+
+// Key by LOCAL date (so it matches what users expect on the calendar)
+function ymdLocal(d: Date) {
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+
+// Monday-start week
+function startOfWeekMonday(d: Date) {
+  const date = new Date(d);
+  const day = date.getDay(); // 0=Sun..6=Sat
+  const diff = (day === 0 ? 6 : day - 1); // how many days since Monday
+  date.setDate(date.getDate() - diff);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
 
 export default function CalendarPage() {
   const [events, setEvents] = useState<any[]>([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
 
-  // ⭐ Load events
+  const month = currentMonth.getMonth();
+  const year = currentMonth.getFullYear();
+
+  // Build a full 6-week grid (42 days), including spillover days
+  const { gridStart, gridDays } = useMemo(() => {
+    const firstOfMonth = new Date(year, month, 1);
+    const start = startOfWeekMonday(firstOfMonth);
+
+    const days: Date[] = [];
+    for (let i = 0; i < 42; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      days.push(d);
+    }
+
+    return { gridStart: start, gridDays: days };
+  }, [month, year]);
+
+  const gridEndExclusive = useMemo(() => {
+    const d = new Date(gridStart);
+    d.setDate(d.getDate() + 42);
+    return d;
+  }, [gridStart]);
+
+  // Fetch events for the visible grid range (and auto-refresh)
   useEffect(() => {
+    let cancelled = false;
+
     const loadEvents = async () => {
       try {
-        const res = await fetch("/api/events", {
-          cache: "no-store",
-        });
-        const data = await res.json();
-
-        const sorted = data.events.sort(
-          (a: any, b: any) =>
-            new Date(a.rawDate).getTime() - new Date(b.rawDate).getTime()
+        // Use UTC ISO strings for the API, but the range itself is based on visible LOCAL grid dates
+        const start = new Date(Date.UTC(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate()));
+        const end = new Date(
+          Date.UTC(gridEndExclusive.getFullYear(), gridEndExclusive.getMonth(), gridEndExclusive.getDate())
         );
 
-        setEvents(sorted);
+        const qs = new URLSearchParams({
+          start: start.toISOString(),
+          end: end.toISOString(),
+        });
+
+        const res = await fetch(`/api/events?${qs.toString()}`, { cache: "no-store" });
+        const data = await res.json();
+
+        const sorted = (data.events ?? []).sort(
+          (a: any, b: any) => new Date(a.rawDate).getTime() - new Date(b.rawDate).getTime()
+        );
+
+        if (!cancelled) setEvents(sorted);
       } catch {
-        setEvents([]);
+        if (!cancelled) setEvents([]);
       }
     };
 
     loadEvents();
-  }, []);
+    const id = setInterval(loadEvents, 120_000); // refresh every 2 mins
 
-  // ------------------------
-  // Month + Day Math
-  // ------------------------
-  const month = currentMonth.getMonth();
-  const year = currentMonth.getFullYear();
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [gridStart, gridEndExclusive]);
 
-  const getDaysInMonth = (m: number, y: number) =>
-    new Date(y, m + 1, 0).getDate();
-
-  const days = getDaysInMonth(month, year);
-
-  // ⭐ Monday-start alignment
-  let firstDayOfWeek = new Date(year, month, 1).getDay();
-  firstDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
-
-  // ------------------------
-  // Group events by day (ONLY show events in current visible month)
-  // ------------------------
-  const eventsByDay: Record<number, any[]> = {};
-
-  events.forEach((event, idx) => {
-    const date = new Date(event.rawDate);
-
-    if (date.getFullYear() === year && date.getMonth() === month) {
-      const day = date.getDate();
-      if (!eventsByDay[day]) eventsByDay[day] = [];
-      eventsByDay[day].push({
-        ...event,
+  // Group by date key (YYYY-MM-DD local)
+  const eventsByDate: Record<string, any[]> = useMemo(() => {
+    const map: Record<string, any[]> = {};
+    events.forEach((ev, idx) => {
+      const d = new Date(ev.rawDate);
+      const key = ymdLocal(d);
+      if (!map[key]) map[key] = [];
+      map[key].push({
+        ...ev,
         color: eventColors[idx % eventColors.length],
       });
-    }
-  });
+    });
+    return map;
+  }, [events]);
 
   // Navigation
   const nextMonth = () => setCurrentMonth(new Date(year, month + 1, 1));
   const prevMonth = () => setCurrentMonth(new Date(year, month - 1, 1));
 
+  const monthLabel = currentMonth.toLocaleString("en-US", { month: "long" });
+
   return (
     <div className="relative min-h-screen bg-[#0d1117] text-gray-100">
-
       {/* BACKGROUND */}
       <div className="fixed inset-0 bg-[url('/images/events-bg.jpg')] bg-cover bg-center opacity-25 pointer-events-none" />
       <div className="fixed inset-0 bg-gradient-to-b from-[#0d1117]/80 to-[#0d1117]/95 pointer-events-none" />
@@ -115,7 +157,7 @@ export default function CalendarPage() {
         </button>
 
         <span className="text-3xl drop-shadow-[0_0_15px_rgba(245,158,11,0.5)]">
-          {currentMonth.toLocaleString("en-US", { month: "long" })} {year}
+          {monthLabel} {year}
         </span>
 
         <button onClick={nextMonth} className="px-4 py-2 hover:text-[#29C3FF] transition">
@@ -125,8 +167,6 @@ export default function CalendarPage() {
 
       {/* DESKTOP GRID */}
       <div className="hidden md:grid grid-cols-7 gap-4 max-w-6xl mx-auto px-6 relative z-10 mb-20">
-
-        {/* Weekday Headers */}
         {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
           <div
             key={d}
@@ -136,53 +176,49 @@ export default function CalendarPage() {
           </div>
         ))}
 
-        {/* Empty Slots */}
-        {[...Array(firstDayOfWeek)].map((_, i) => (
-          <div key={`empty-${i}`} className="p-3 rounded-xl"></div>
-        ))}
-
-        {/* DAYS */}
-        {[...Array(days)].map((_, i) => {
-          const day = i + 1;
-          const dayEvents = eventsByDay[day] || [];
+        {gridDays.map((dateObj, i) => {
+          const key = ymdLocal(dateObj);
+          const dayEvents = eventsByDate[key] || [];
 
           const isToday =
-            day === new Date().getDate() &&
-            month === new Date().getMonth() &&
-            year === new Date().getFullYear();
+            key === ymdLocal(new Date());
+
+          const isInCurrentMonth = dateObj.getMonth() === month && dateObj.getFullYear() === year;
 
           return (
             <div
-              key={day}
+              key={`${key}-${i}`}
               className={`min-h-[120px] rounded-xl p-3 border border-white/10 bg-[#111827]/60 backdrop-blur-md transition hover:scale-[1.02] shadow-[0_0_15px_rgba(0,0,0,0.4)]
                 ${isToday ? "ring-2 ring-[#29C3FF] shadow-[0_0_25px_#29C3FF]" : ""}
+                ${!isInCurrentMonth ? "opacity-60" : ""}
               `}
             >
               <p
                 className={`font-semibold mb-2 ${
                   isToday
                     ? "text-[#29C3FF] font-bold drop-shadow-[0_0_12px_rgba(41,195,255,0.9)]"
-                    : "text-gray-300"
+                    : isInCurrentMonth
+                      ? "text-gray-300"
+                      : "text-gray-400"
                 }`}
               >
-                {day}
+                {dateObj.getDate()}
               </p>
 
-              {dayEvents.length > 0 &&
-                dayEvents.map((ev, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedEvent(ev)}
-                    className="text-left w-full text-xs px-2 py-1 rounded-md mb-1 transition hover:opacity-80"
-                    style={{
-                      backgroundColor: `${ev.color}30`,
-                      borderLeft: `3px solid ${ev.color}`,
-                      boxShadow: `0 0 10px ${ev.color}60`,
-                    }}
-                  >
-                    {ev.title}
-                  </button>
-                ))}
+              {dayEvents.map((ev, idx) => (
+                <button
+                  key={`${ev.id}-${idx}`}
+                  onClick={() => setSelectedEvent(ev)}
+                  className="text-left w-full text-xs px-2 py-1 rounded-md mb-1 transition hover:opacity-80"
+                  style={{
+                    backgroundColor: `${ev.color}30`,
+                    borderLeft: `3px solid ${ev.color}`,
+                    boxShadow: `0 0 10px ${ev.color}60`,
+                  }}
+                >
+                  {ev.title}
+                </button>
+              ))}
             </div>
           );
         })}
@@ -190,18 +226,16 @@ export default function CalendarPage() {
 
       {/* MOBILE LIST */}
       <div className="md:hidden px-6 relative z-10">
-        {events
-          .filter((ev) => {
-            const d = new Date(ev.rawDate);
-            return d.getMonth() === month && d.getFullYear() === year;
-          })
+        {gridDays
+          .filter((d) => d.getMonth() === month && d.getFullYear() === year)
+          .flatMap((d) => (eventsByDate[ymdLocal(d)] ?? []))
           .map((ev, i) => {
             const d = new Date(ev.rawDate);
-            const color = eventColors[i % eventColors.length];
+            const color = ev.color || eventColors[i % eventColors.length];
 
             return (
               <button
-                key={ev.id}
+                key={`${ev.id}-${i}`}
                 onClick={() => setSelectedEvent(ev)}
                 className="mb-6 p-4 w-full text-left rounded-xl border border-white/10 bg-[#111827]/70 backdrop-blur-md shadow-[0_0_20px_-5px_rgba(0,0,0,0.5)]"
                 style={{
