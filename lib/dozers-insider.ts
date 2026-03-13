@@ -20,4 +20,9 @@ export const INSIDER_POSTS: InsiderPost[] = [
     desc: "Late-night service industry specials Monday through Thursday — food, drinks, and the right vibe.",
     href: "/blog/industry-nights-mesa-az",
   },
+  {
+    title: "Watch Sports During Lunch in Mesa, AZ",
+    desc: "Grab lunch, watch the game, and relax at Dozers — Mesa’s go-to lunch sports bar.",
+    href: "/blog/watch-sports-lunch-mesa-az",
+  },
 ];
