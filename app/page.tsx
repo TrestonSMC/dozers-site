@@ -1,8 +1,3 @@
-// ✅ FILE 3: app/page.tsx (YOUR HOME PAGE)
-// Replace your current home page with this.
-// Only change from your latest: it now imports INSIDER_POSTS from lib/dozers-insider.ts
-// and maps those, so you NEVER touch homepage again to add posts.
-
 "use client";
 
 import { useRef, useState, useEffect } from "react";
@@ -155,16 +150,22 @@ export default function Home() {
         </button>
 
         {menuOpen && (
-          <div className="absolute top-full right-8 mt-2 w-56 bg-[#111827]/95 border border-[#29C3FF]/30 rounded-xl shadow-lg backdrop-blur-lg z-50">
+          <div className="absolute top-full right-8 mt-2 w-64 bg-[#111827]/95 border border-[#29C3FF]/30 rounded-xl shadow-lg backdrop-blur-lg z-50">
             <ul className="flex flex-col text-center py-3 text-sm uppercase tracking-wider">
-              {["about", "gallery", "events", "contact"].map((item) => (
-                <li key={item}>
+              {[
+                { label: "About", href: "/about" },
+                { label: "Gallery", href: "/gallery" },
+                { label: "Events", href: "/events" },
+                { label: "Contact", href: "/contact" },
+                { label: "SMS Policies", href: "/sms-terms-and-conditions" },
+              ].map((item) => (
+                <li key={item.href}>
                   <Link
-                    href={`/${item}`}
+                    href={item.href}
                     onClick={() => setMenuOpen(false)}
                     className="block w-full py-3 hover:bg-[#29C3FF]/10 text-gray-300 hover:text-[#F59E0B] transition"
                   >
-                    {item.charAt(0).toUpperCase() + item.slice(1)}
+                    {item.label}
                   </Link>
                 </li>
               ))}
@@ -201,12 +202,12 @@ export default function Home() {
           <h2 className="text-4xl font-[Playfair_Display] mb-6 text-white drop-shadow-[0_0_25px_rgba(16,185,129,0.4)]">
             The Experience
           </h2>
-         <p className="text-gray-300 text-lg leading-relaxed mb-8">
-  Step into Dozers Grill, a full-service restaurant and bar where great
-  food, drink specials, and handcrafted cocktails set the stage. Paired
-  with a vibrant atmosphere, weekly events, and recurring nights, every
-  visit feels familiar — and never the same.
-</p>
+          <p className="text-gray-300 text-lg leading-relaxed mb-8">
+            Step into Dozers Grill, a full-service restaurant and bar where
+            great food, drink specials, and handcrafted cocktails set the
+            stage. Paired with a vibrant atmosphere, weekly events, and
+            recurring nights, every visit feels familiar — and never the same.
+          </p>
 
           <Link href="/gallery">
             <Button className="border-0 text-white bg-gradient-to-r from-[#10B981] to-[#29C3FF] px-8 py-4 rounded-full text-lg tracking-wider hover:scale-105 transition-transform shadow-[0_0_25px_-5px_rgba(16,185,129,0.6)]">
@@ -384,74 +385,74 @@ export default function Home() {
         )}
       </section>
 
-{/* DOZERS INSIDER (clean edge-bleed, no see-through) */}
-<section className="py-20 px-6 md:px-20 border-t border-[#10B981]/20 bg-[#111827]/70 backdrop-blur-md overflow-hidden">
-  <div className="max-w-6xl mx-auto">
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-10">
-      <div className="text-left">
-        <h2 className="text-4xl font-[Playfair_Display] text-white drop-shadow-[0_0_25px_rgba(16,185,129,0.45)]">
-          Dozers Insider
-        </h2>
-        <p className="text-gray-300 mt-2 text-sm">
-          Local guides, food highlights, and what&apos;s going on at Dozers.
-        </p>
-      </div>
+      {/* DOZERS INSIDER (clean edge-bleed, no see-through) */}
+      <section className="py-20 px-6 md:px-20 border-t border-[#10B981]/20 bg-[#111827]/70 backdrop-blur-md overflow-hidden">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-10">
+            <div className="text-left">
+              <h2 className="text-4xl font-[Playfair_Display] text-white drop-shadow-[0_0_25px_rgba(16,185,129,0.45)]">
+                Dozers Insider
+              </h2>
+              <p className="text-gray-300 mt-2 text-sm">
+                Local guides, food highlights, and what&apos;s going on at Dozers.
+              </p>
+            </div>
 
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => scrollInsider("left")}
-          aria-label="Scroll left"
-          className="h-11 w-11 rounded-full border border-[#10B981]/30 bg-[#0d1117]/50 hover:bg-[#10B981]/10 transition shadow-[0_0_18px_-8px_rgba(16,185,129,0.6)] flex items-center justify-center"
-        >
-          <span className="text-white text-xl">‹</span>
-        </button>
-        <button
-          onClick={() => scrollInsider("right")}
-          aria-label="Scroll right"
-          className="h-11 w-11 rounded-full border border-[#10B981]/30 bg-[#0d1117]/50 hover:bg-[#10B981]/10 transition shadow-[0_0_18px_-8px_rgba(16,185,129,0.6)] flex items-center justify-center"
-        >
-          <span className="text-white text-xl">›</span>
-        </button>
-      </div>
-    </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => scrollInsider("left")}
+                aria-label="Scroll left"
+                className="h-11 w-11 rounded-full border border-[#10B981]/30 bg-[#0d1117]/50 hover:bg-[#10B981]/10 transition shadow-[0_0_18px_-8px_rgba(16,185,129,0.6)] flex items-center justify-center"
+              >
+                <span className="text-white text-xl">‹</span>
+              </button>
+              <button
+                onClick={() => scrollInsider("right")}
+                aria-label="Scroll right"
+                className="h-11 w-11 rounded-full border border-[#10B981]/30 bg-[#0d1117]/50 hover:bg-[#10B981]/10 transition shadow-[0_0_18px_-8px_rgba(16,185,129,0.6)] flex items-center justify-center"
+              >
+                <span className="text-white text-xl">›</span>
+              </button>
+            </div>
+          </div>
 
-    {/* edge bleed scroller */}
-    <div className="relative -mx-6 md:-mx-20">
-      {/* solid fades so you never see the background video through the edges */}
-      <div className="pointer-events-none absolute left-0 top-0 h-full w-14 z-10 bg-gradient-to-r from-[#111827] via-[#111827] to-transparent" />
-      <div className="pointer-events-none absolute right-0 top-0 h-full w-14 z-10 bg-gradient-to-l from-[#111827] via-[#111827] to-transparent" />
+          {/* edge bleed scroller */}
+          <div className="relative -mx-6 md:-mx-20">
+            {/* solid fades so you never see the background video through the edges */}
+            <div className="pointer-events-none absolute left-0 top-0 h-full w-14 z-10 bg-gradient-to-r from-[#111827] via-[#111827] to-transparent" />
+            <div className="pointer-events-none absolute right-0 top-0 h-full w-14 z-10 bg-gradient-to-l from-[#111827] via-[#111827] to-transparent" />
 
-      <div
-        ref={insiderScrollRef}
-        className="dozers-insider-scroll flex gap-6 overflow-x-auto scroll-smooth pb-4 px-6 md:px-20"
-      >
-        {INSIDER_POSTS.map((post, i) => (
-          <motion.div
-            key={post.href}
-            initial={{ opacity: 0, y: 14 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: i * 0.06 }}
-            className="min-w-[280px] sm:min-w-[340px] md:min-w-[380px] p-7 rounded-2xl border border-[#10B981]/20 bg-[#1a1f2a]/70 backdrop-blur-md text-left shadow-[0_0_25px_-8px_rgba(16,185,129,0.45)] hover:scale-[1.02] transition-transform"
-          >
-            <h3 className="text-xl font-semibold text-white mb-2">
-              {post.title}
-            </h3>
-            <p className="text-gray-300 text-sm leading-relaxed mb-5">
-              {post.desc}
-            </p>
-
-            <Link
-              href={post.href}
-              className="inline-flex items-center gap-2 text-[#29C3FF] hover:text-[#F59E0B] transition font-semibold"
+            <div
+              ref={insiderScrollRef}
+              className="dozers-insider-scroll flex gap-6 overflow-x-auto scroll-smooth pb-4 px-6 md:px-20"
             >
-              Read more <span aria-hidden>→</span>
-            </Link>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  </div>
-</section>
+              {INSIDER_POSTS.map((post, i) => (
+                <motion.div
+                  key={post.href}
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, delay: i * 0.06 }}
+                  className="min-w-[280px] sm:min-w-[340px] md:min-w-[380px] p-7 rounded-2xl border border-[#10B981]/20 bg-[#1a1f2a]/70 backdrop-blur-md text-left shadow-[0_0_25px_-8px_rgba(16,185,129,0.45)] hover:scale-[1.02] transition-transform"
+                >
+                  <h3 className="text-xl font-semibold text-white mb-2">
+                    {post.title}
+                  </h3>
+                  <p className="text-gray-300 text-sm leading-relaxed mb-5">
+                    {post.desc}
+                  </p>
+
+                  <Link
+                    href={post.href}
+                    className="inline-flex items-center gap-2 text-[#29C3FF] hover:text-[#F59E0B] transition font-semibold"
+                  >
+                    Read more <span aria-hidden>→</span>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* FOOTER */}
       <footer className="py-8 px-6 md:px-10 border-t border-[#29C3FF]/30 bg-[#0d1117]/80 backdrop-blur-md text-center text-gray-400 text-sm">
