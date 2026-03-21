@@ -157,6 +157,7 @@ export default function Home() {
                 { label: "Gallery", href: "/gallery" },
                 { label: "Events", href: "/events" },
                 { label: "Contact", href: "/contact" },
+                { label: "Privacy Policy", href: "/privacy-policy" },
                 { label: "SMS Policies", href: "/sms-terms-and-conditions" },
               ].map((item) => (
                 <li key={item.href}>
