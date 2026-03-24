@@ -8,9 +8,6 @@ import { Button } from "@/components/ui/button";
 import { INSIDER_POSTS } from "@/lib/dozers-insider";
 
 export default function Home() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  const [isPlaying, setIsPlaying] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   // ⭐ Dynamic events
@@ -26,19 +23,6 @@ export default function Home() {
   const supabaseBase =
     "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-videos";
 
-  const toggleVideo = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (isPlaying) {
-      video.pause();
-      setIsPlaying(false);
-    } else {
-      video.muted = false;
-      video.play();
-      setIsPlaying(true);
-    }
-  };
-
   // ⭐ Load events
   useEffect(() => {
     const loadEvents = async () => {
@@ -49,14 +33,12 @@ export default function Home() {
         const all = data.events || [];
         const now = new Date();
 
-        // ⭐ ONLY future events
         const upcoming = all.filter((ev: any) => {
           if (!ev.rawDate) return false;
           const d = new Date(ev.rawDate);
           return d >= now;
         });
 
-        // ⭐ Sort future events by date
         upcoming.sort(
           (
             a: { rawDate: string | number | Date },
@@ -107,14 +89,13 @@ export default function Home() {
 
   return (
     <div className="relative bg-[#0d1117] text-gray-100 overflow-x-hidden">
-      {/* Hide scrollbar ONLY for the insider scroller (safe, no side effects) */}
       <style>{`
         .dozers-insider-scroll {
-          scrollbar-width: none; /* Firefox */
-          -ms-overflow-style: none; /* IE/Edge */
+          scrollbar-width: none;
+          -ms-overflow-style: none;
         }
         .dozers-insider-scroll::-webkit-scrollbar {
-          display: none; /* Chrome/Safari */
+          display: none;
         }
       `}</style>
 
@@ -157,8 +138,6 @@ export default function Home() {
                 { label: "Gallery", href: "/gallery" },
                 { label: "Events", href: "/events" },
                 { label: "Contact", href: "/contact" },
-                { label: "Privacy Policy", href: "/privacy-policy" },
-                { label: "SMS Policies", href: "/sms-terms-and-conditions" },
               ].map((item) => (
                 <li key={item.href}>
                   <Link
@@ -197,9 +176,9 @@ export default function Home() {
       {/* EXPERIENCE */}
       <section
         id="experience"
-        className="relative py-24 px-6 md:px-20 flex flex-col md:flex-row items-center gap-10 border-t border-[#10B981]/20 bg-[#111827]/70 backdrop-blur-md overflow-hidden"
+        className="relative py-24 px-6 md:px-20 border-t border-[#10B981]/20 bg-[#111827]/70 backdrop-blur-md overflow-hidden"
       >
-        <div className="flex-1 text-center md:text-left z-10">
+        <div className="max-w-4xl mx-auto text-center z-10">
           <h2 className="text-4xl font-[Playfair_Display] mb-6 text-white drop-shadow-[0_0_25px_rgba(16,185,129,0.4)]">
             The Experience
           </h2>
@@ -216,41 +195,9 @@ export default function Home() {
             </Button>
           </Link>
         </div>
-
-        <div className="relative flex-1 z-10 w-full">
-          <div className="relative rounded-lg overflow-hidden shadow-[0_0_40px_-5px_rgba(16,185,129,0.5)] border border-[#10B981]/20">
-            <video
-              ref={videoRef}
-              loop
-              playsInline
-              preload="auto"
-              className="w-full h-auto rounded-lg cursor-pointer"
-              onClick={toggleVideo}
-            >
-              <source src={`${supabaseBase}/experience.mp4`} type="video/mp4" />
-            </video>
-            {!isPlaying && (
-              <button
-                onClick={toggleVideo}
-                className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm hover:bg-black/30 transition"
-              >
-                <div className="p-4 rounded-full border border-white/30 shadow-[0_0_25px_rgba(16,185,129,0.6)] bg-[#10B981]/80">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="white"
-                    viewBox="0 0 24 24"
-                    className="w-10 h-10"
-                  >
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-              </button>
-            )}
-          </div>
-        </div>
       </section>
 
-      {/* EVENTS — ONLY FUTURE EVENTS */}
+      {/* EVENTS */}
       <section
         id="events"
         className="py-24 px-6 md:px-20 text-center border-t border-[#29C3FF]/20 bg-[#111827]/80 backdrop-blur-md"
@@ -386,7 +333,7 @@ export default function Home() {
         )}
       </section>
 
-      {/* DOZERS INSIDER (clean edge-bleed, no see-through) */}
+      {/* DOZERS INSIDER */}
       <section className="py-20 px-6 md:px-20 border-t border-[#10B981]/20 bg-[#111827]/70 backdrop-blur-md overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-10">
@@ -417,9 +364,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* edge bleed scroller */}
           <div className="relative -mx-6 md:-mx-20">
-            {/* solid fades so you never see the background video through the edges */}
             <div className="pointer-events-none absolute left-0 top-0 h-full w-14 z-10 bg-gradient-to-r from-[#111827] via-[#111827] to-transparent" />
             <div className="pointer-events-none absolute right-0 top-0 h-full w-14 z-10 bg-gradient-to-l from-[#111827] via-[#111827] to-transparent" />
 
