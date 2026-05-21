@@ -25,4 +25,9 @@ export const INSIDER_POSTS: InsiderPost[] = [
     desc: "Grab lunch, watch the game, and relax at Dozers — Mesa’s go-to lunch sports bar.",
     href: "/blog/watch-sports-lunch-mesa-az",
   },
+ {
+  title: "Live Music is Coming to Dozers Grill",
+  desc: "Local bands, cold drinks, and weekend energy — live music nights are arriving at Dozers in Mesa, AZ.",
+  href: "/blog/live-music-mesa-az",
+}
 ];

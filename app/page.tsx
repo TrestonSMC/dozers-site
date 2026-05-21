@@ -7,27 +7,70 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { INSIDER_POSTS } from "@/lib/dozers-insider";
 
+type Review = {
+  author: string;
+  rating: number;
+  text: string;
+  time?: string;
+  profile?: string;
+};
+
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // ⭐ Dynamic events
   const [events, setEvents] = useState<any[]>([]);
-
-  // ⭐ Dynamic reviews
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
 
-  // ⭐ FILTER: Show 4 & 5 star reviews only
-  const fourAndFiveStarReviews = reviews.filter((r) => Number(r.rating) >= 4);
+  const getRating = (rating: any) => {
+    if (typeof rating === "number") return rating;
+    if (typeof rating === "string") {
+      const match = rating.match(/\d+(\.\d+)?/);
+      return match ? Number(match[0]) : 0;
+    }
+    return 0;
+  };
+
+  const fourAndFiveStarReviews = reviews.filter((r) => getRating(r.rating) >= 4);
 
   const supabaseBase =
     "https://djethkxabnuydbbnbsgn.supabase.co/storage/v1/object/public/dozers-videos";
 
-  // ⭐ Load events
+  const liveMusicSchedule = [
+    {
+      date: "Sat June 6",
+      acts: [
+        { time: "3PM", name: "Poor Barbie" },
+        { time: "7PM", name: "Tim Apple" },
+      ],
+    },
+    {
+      date: "Sat June 13",
+      acts: [
+        { time: "3PM", name: "Arizona Avenue" },
+        { time: "7PM", name: "Notes From Neptune" },
+      ],
+    },
+    {
+      date: "Sat June 20",
+      acts: [
+        { time: "3PM", name: "Stilettos" },
+        { time: "7PM", name: "Jake Dean" },
+      ],
+    },
+    {
+      date: "Sat June 27",
+      acts: [
+        { time: "3PM", name: "Doc Baldi" },
+        { time: "7PM", name: "Harry McGraw Trio" },
+      ],
+    },
+  ];
+
   useEffect(() => {
     const loadEvents = async () => {
       try {
-        const res = await fetch("/api/events");
+        const res = await fetch("/api/events", { cache: "no-store" });
         const data = await res.json();
 
         const all = data.events || [];
@@ -51,29 +94,53 @@ export default function Home() {
         setEvents([]);
       }
     };
+
     loadEvents();
   }, []);
 
-  // ⭐ Load reviews
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const res = await fetch("/api/reviews");
+        const res = await fetch("/api/reviews", { cache: "no-store" });
+
+        if (!res.ok) {
+          throw new Error(`Reviews API failed with status ${res.status}`);
+        }
+
         const data = await res.json();
-        setReviews(data?.reviews || []);
-      } catch {
+
+        console.log("REVIEWS API RESPONSE:", data);
+
+        const incomingReviews =
+          data?.reviews ||
+          data?.result?.reviews ||
+          data?.data?.reviews ||
+          [];
+
+        const normalizedReviews: Review[] = incomingReviews
+          .map((r: any) => ({
+            author: r.author || r.author_name || r.name || "Guest",
+            rating: getRating(r.rating),
+            text: r.text || r.review || "",
+            time: r.time || r.relative_time_description || "",
+            profile: r.profile || r.profile_photo_url || "",
+          }))
+          .filter((r: Review) => r.text && r.rating > 0);
+
+        setReviews(normalizedReviews);
+      } catch (err) {
+        console.error("Failed to load reviews:", err);
         setReviews([]);
       } finally {
         setLoadingReviews(false);
       }
     };
+
     fetchReviews();
   }, []);
 
-  // ⭐ Colors to rotate for event cards
   const eventColors = ["#29C3FF", "#F59E0B", "#10B981"];
 
-  // ⭐ Slider refs
   const insiderScrollRef = useRef<HTMLDivElement>(null);
 
   const scrollInsider = (dir: "left" | "right") => {
@@ -81,6 +148,7 @@ export default function Home() {
     if (!el) return;
 
     const amount = Math.max(280, Math.floor(el.clientWidth * 0.75));
+
     el.scrollBy({
       left: dir === "left" ? -amount : amount,
       behavior: "smooth",
@@ -94,12 +162,12 @@ export default function Home() {
           scrollbar-width: none;
           -ms-overflow-style: none;
         }
+
         .dozers-insider-scroll::-webkit-scrollbar {
           display: none;
         }
       `}</style>
 
-      {/* Background video */}
       <video
         autoPlay
         loop
@@ -113,15 +181,16 @@ export default function Home() {
 
       <div className="fixed inset-0 bg-gradient-to-b from-transparent via-[#0d1117]/40 to-[#0d1117]/90 z-0" />
 
-      {/* Header */}
       <header className="fixed top-0 left-0 w-full flex justify-between items-center px-8 py-5 z-50 backdrop-blur-md bg-[#0d1117]/70 border-b border-[#29C3FF]/20">
-        <Image
-          src="/images/dozers-logo.png"
-          alt="Dozers Grill Logo"
-          width={140}
-          height={60}
-          className="drop-shadow-[0_0_20px_rgba(41,195,255,0.4)]"
-        />
+        <Link href="/" aria-label="Dozers Grill Home">
+          <Image
+            src="/images/dozers-logo.png"
+            alt="Dozers Grill Logo"
+            width={140}
+            height={60}
+            className="drop-shadow-[0_0_20px_rgba(41,195,255,0.4)]"
+          />
+        </Link>
 
         <button
           onClick={() => setMenuOpen(!menuOpen)}
@@ -135,8 +204,10 @@ export default function Home() {
             <ul className="flex flex-col text-center py-3 text-sm uppercase tracking-wider">
               {[
                 { label: "About", href: "/about" },
+                { label: "Menu", href: "/menu" },
                 { label: "Gallery", href: "/gallery" },
                 { label: "Events", href: "/events" },
+                { label: "Live Music", href: "/live-music" },
                 { label: "Contact", href: "/contact" },
               ].map((item) => (
                 <li key={item.href}>
@@ -154,16 +225,18 @@ export default function Home() {
         )}
       </header>
 
-      {/* HERO */}
       <section className="relative min-h-screen flex flex-col justify-center items-center text-center px-4 z-10">
         <div className="absolute inset-0 bg-gradient-to-t from-[#0d1117]/70 via-transparent to-transparent z-0" />
+
         <h1 className="text-5xl md:text-7xl font-[Playfair_Display] font-bold text-white drop-shadow-[0_0_35px_rgba(245,158,11,0.6)] z-10">
           Welcome to Dozers Grill
         </h1>
+
         <p className="text-gray-300 mt-6 text-lg md:text-xl max-w-2xl z-10">
           Great food, cold drinks, and good company.
           <br /> Open daily until 2 AM.
         </p>
+
         <div className="mt-10 z-10">
           <Link href="/menu">
             <Button className="border-0 text-white bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-10 py-5 rounded-full text-lg tracking-wider hover:scale-105 transition-transform">
@@ -173,7 +246,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* EXPERIENCE */}
       <section
         id="experience"
         className="relative py-24 px-6 md:px-20 border-t border-[#10B981]/20 bg-[#111827]/70 backdrop-blur-md overflow-hidden"
@@ -182,11 +254,12 @@ export default function Home() {
           <h2 className="text-4xl font-[Playfair_Display] mb-6 text-white drop-shadow-[0_0_25px_rgba(16,185,129,0.4)]">
             The Experience
           </h2>
+
           <p className="text-gray-300 text-lg leading-relaxed mb-8">
             Step into Dozers Grill, a full-service restaurant and bar where
-            great food, drink specials, and handcrafted cocktails set the
-            stage. Paired with a vibrant atmosphere, weekly events, and
-            recurring nights, every visit feels familiar — and never the same.
+            great food, drink specials, and handcrafted cocktails set the stage.
+            Paired with a vibrant atmosphere, weekly events, and recurring
+            nights, every visit feels familiar — and never the same.
           </p>
 
           <Link href="/gallery">
@@ -197,7 +270,79 @@ export default function Home() {
         </div>
       </section>
 
-      {/* EVENTS */}
+      <section
+        id="live-music"
+        className="py-24 px-6 md:px-20 border-t border-[#F59E0B]/20 bg-[#0d1117]/80 backdrop-blur-md"
+      >
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="uppercase tracking-[0.3em] text-[#F59E0B] text-sm mb-4">
+              Stage @ Dozers
+            </p>
+
+            <h2 className="text-4xl md:text-5xl font-[Playfair_Display] text-white drop-shadow-[0_0_25px_rgba(245,158,11,0.45)]">
+              Live Music Every Saturday In June
+            </h2>
+
+            <p className="text-gray-300 mt-6 max-w-3xl mx-auto text-lg leading-relaxed">
+              Join us for live local music, cold drinks, handcrafted cocktails,
+              and weekend energy all month long at Dozers Grill.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-8">
+            {liveMusicSchedule.map((show, i) => (
+              <motion.div
+                key={show.date}
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, delay: i * 0.08 }}
+                className="rounded-2xl border border-[#F59E0B]/20 bg-[#111827]/70 backdrop-blur-md p-8 shadow-[0_0_30px_-8px_rgba(245,158,11,0.35)] hover:scale-[1.02] transition-transform"
+              >
+                <div className="mb-6">
+                  <p className="text-[#F59E0B] uppercase tracking-[0.25em] text-xs mb-2">
+                    Live Music
+                  </p>
+
+                  <h3 className="text-3xl font-[Playfair_Display] text-white">
+                    {show.date}
+                  </h3>
+                </div>
+
+                <div className="space-y-5">
+                  {show.acts.map((act) => (
+                    <div
+                      key={act.name}
+                      className="flex items-center justify-between gap-5 border-b border-white/10 pb-4 last:border-b-0 last:pb-0"
+                    >
+                      <span className="text-[#29C3FF] font-semibold tracking-wide whitespace-nowrap">
+                        {act.time}
+                      </span>
+
+                      <span className="text-gray-200 text-right font-medium">
+                        {act.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center mt-14">
+            <p className="text-gray-400 text-sm mb-6">
+              7012 E Hampton Ave • Mesa, Arizona
+            </p>
+
+            <Link href="/live-music">
+              <Button className="border-0 text-white bg-gradient-to-r from-[#F59E0B] to-[#29C3FF] px-10 py-5 rounded-full text-lg tracking-wider hover:scale-105 transition-transform">
+                View Live Music
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <section
         id="events"
         className="py-24 px-6 md:px-20 text-center border-t border-[#29C3FF]/20 bg-[#111827]/80 backdrop-blur-md"
@@ -213,6 +358,7 @@ export default function Home() {
             <div className="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto mb-16">
               {events.slice(0, 3).map((event, i) => {
                 const color = eventColors[i % eventColors.length];
+
                 return (
                   <motion.div
                     key={event.id}
@@ -225,10 +371,15 @@ export default function Home() {
                       boxShadow: `0 0 25px -5px ${color}`,
                     }}
                   >
-                    <h3 className="text-2xl font-semibold mb-2" style={{ color }}>
+                    <h3
+                      className="text-2xl font-semibold mb-2"
+                      style={{ color }}
+                    >
                       {event.title}
                     </h3>
+
                     <p className="text-gray-400 mb-3 text-sm">{event.time}</p>
+
                     <p className="text-gray-300 text-base leading-relaxed">
                       {event.desc}
                     </p>
@@ -254,7 +405,6 @@ export default function Home() {
         )}
       </section>
 
-      {/* LOCATION */}
       <section
         id="contact"
         className="py-24 px-6 md:px-20 border-t border-[#F59E0B]/20 bg-[#111827]/70 backdrop-blur-md"
@@ -264,17 +414,26 @@ export default function Home() {
             <h2 className="text-4xl font-[Playfair_Display] mb-6 text-white drop-shadow-[0_0_25px_rgba(245,158,11,0.4)]">
               Visit Dozers Grill
             </h2>
+
             <p className="text-gray-300 mb-2 text-lg">
               7012 E Hampton Ave, Mesa, AZ 85209
             </p>
+
             <p className="text-gray-300 mb-2 text-lg">(602) 694-5551</p>
+
             <p className="text-gray-400 mb-8 text-sm">
               Kitchen: Sun–Thurs 10 AM – 10 PM • Fri–Sat 10 AM – 12 AM
             </p>
 
-            <Button className="border-0 text-white bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-8 py-4 rounded-full hover:scale-105 transition-transform">
-              Get Directions
-            </Button>
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=Dozers+Grill+7012+E+Hampton+Ave+Mesa+AZ+85209"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button className="border-0 text-white bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-8 py-4 rounded-full hover:scale-105 transition-transform">
+                Get Directions
+              </Button>
+            </a>
           </div>
 
           <div className="flex-1 w-full rounded-2xl overflow-hidden border border-[#29C3FF]/30 shadow-[0_0_25px_-5px_rgba(41,195,255,0.4)]">
@@ -285,12 +444,11 @@ export default function Home() {
               height="400"
               style={{ border: 0 }}
               loading="lazy"
-            ></iframe>
+            />
           </div>
         </div>
       </section>
 
-      {/* REVIEWS */}
       <section className="py-24 px-6 md:px-20 text-center border-t border-[#29C3FF]/30 bg-[#0d1117]/80 backdrop-blur-md">
         <h2 className="text-4xl font-[Playfair_Display] text-white mb-10 drop-shadow-[0_0_25px_rgba(41,195,255,0.5)]">
           Top Customer Reviews
@@ -299,12 +457,14 @@ export default function Home() {
         {loadingReviews ? (
           <p className="text-gray-400">Loading reviews...</p>
         ) : fourAndFiveStarReviews.length === 0 ? (
-          <p className="text-gray-500 text-sm">No top reviews yet</p>
+          <p className="text-gray-500 text-sm">
+            No top reviews yet. Check the console for the reviews API response.
+          </p>
         ) : (
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {fourAndFiveStarReviews.map((r, i) => (
+            {fourAndFiveStarReviews.slice(0, 6).map((r, i) => (
               <motion.div
-                key={i}
+                key={`${r.author}-${i}`}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
@@ -315,25 +475,28 @@ export default function Home() {
                     <img
                       src={r.profile}
                       alt={r.author}
-                      className="w-10 h-10 rounded-full border border-[#29C3FF]/40 mb-2"
+                      className="w-10 h-10 rounded-full border border-[#29C3FF]/40 mb-2 object-cover"
                     />
                   )}
+
                   <p className="text-[#29C3FF] font-semibold">{r.author}</p>
+
                   {r.time && <p className="text-gray-500 text-xs">{r.time}</p>}
                 </div>
 
                 <div className="flex justify-center text-[#F59E0B] mb-3 text-sm">
-                  {"★".repeat(Number(r.rating))}
+                  {"★".repeat(Math.round(getRating(r.rating)))}
                 </div>
 
-                <p className="text-gray-300 italic leading-relaxed">“{r.text}”</p>
+                <p className="text-gray-300 italic leading-relaxed">
+                  “{r.text}”
+                </p>
               </motion.div>
             ))}
           </div>
         )}
       </section>
 
-      {/* DOZERS INSIDER */}
       <section className="py-20 px-6 md:px-20 border-t border-[#10B981]/20 bg-[#111827]/70 backdrop-blur-md overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-10">
@@ -341,8 +504,10 @@ export default function Home() {
               <h2 className="text-4xl font-[Playfair_Display] text-white drop-shadow-[0_0_25px_rgba(16,185,129,0.45)]">
                 Dozers Insider
               </h2>
+
               <p className="text-gray-300 mt-2 text-sm">
-                Local guides, food highlights, and what&apos;s going on at Dozers.
+                Local guides, food highlights, and what&apos;s going on at
+                Dozers.
               </p>
             </div>
 
@@ -354,6 +519,7 @@ export default function Home() {
               >
                 <span className="text-white text-xl">‹</span>
               </button>
+
               <button
                 onClick={() => scrollInsider("right")}
                 aria-label="Scroll right"
@@ -383,6 +549,7 @@ export default function Home() {
                   <h3 className="text-xl font-semibold text-white mb-2">
                     {post.title}
                   </h3>
+
                   <p className="text-gray-300 text-sm leading-relaxed mb-5">
                     {post.desc}
                   </p>
@@ -400,7 +567,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FOOTER */}
       <footer className="py-8 px-6 md:px-10 border-t border-[#29C3FF]/30 bg-[#0d1117]/80 backdrop-blur-md text-center text-gray-400 text-sm">
         <div className="space-y-3">
           <p>© 2025 Dozers Grill • All Rights Reserved</p>
@@ -427,8 +593,6 @@ export default function Home() {
     </div>
   );
 }
-
-
 
 
 
