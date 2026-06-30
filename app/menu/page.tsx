@@ -44,15 +44,15 @@ export default function MenuPage() {
                 paddingBottom: `${TOP_CROP_PX}px`,
               }}
             >
-              <div id="1tmd-8" className="w-full" />
+              <div id="1tmd-a" className="w-full" />
             </div>
           </div>
         </div>
 
         <Script
-          id="1tmd-8-script"
+          id="1tmd-a-script"
           type="text/javascript"
-          src="https://imenupro.com/!1tmd-8"
+          src="https://imenupro.com/!1tmd-a"
           strategy="afterInteractive"
         />
 
@@ -62,18 +62,18 @@ export default function MenuPage() {
             background: #0d1117;
           }
 
-          #\\31 tmd-8,
-          #\\31 tmd-8 * {
+          #\\31 tmd-a,
+          #\\31 tmd-a * {
             box-sizing: border-box;
           }
 
-          #\\31 tmd-8 .imp-menu,
-          #\\31 tmd-8 .imp-menu * {
+          #\\31 tmd-a .imp-menu,
+          #\\31 tmd-a .imp-menu * {
             margin-top: 0 !important;
           }
 
-          #\\31 tmd-8 .imp-title-heading,
-          #\\31 tmd-8 .imp-heading {
+          #\\31 tmd-a .imp-title-heading,
+          #\\31 tmd-a .imp-heading {
             padding-top: 0 !important;
           }
         `}</style>
