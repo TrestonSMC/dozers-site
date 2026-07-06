@@ -281,7 +281,7 @@ export default function Home() {
             </p>
 
             <h2 className="text-4xl md:text-5xl font-[Playfair_Display] text-white drop-shadow-[0_0_25px_rgba(245,158,11,0.45)]">
-              Live Music Every Saturday In June
+              Live Music @ Dozers. Check out our line up!
             </h2>
 
             <p className="text-gray-300 mt-6 max-w-3xl mx-auto text-lg leading-relaxed">
