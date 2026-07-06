@@ -38,31 +38,31 @@ export default function Home() {
 
   const liveMusicSchedule = [
     {
-      date: "Sat June 6",
+      date: "Sat July 11th",
       acts: [
-        { time: "3PM", name: "Poor Barbie" },
-        { time: "7PM", name: "Tim Apple" },
+        { time: "3PM", name: "Worlds Smallest Quartet" },
+        { time: "7PM", name: "Doc Baldi" },
       ],
     },
     {
-      date: "Sat June 13",
+      date: "Sat July 18th",
       acts: [
-        { time: "3PM", name: "Arizona Avenue" },
-        { time: "7PM", name: "Notes From Neptune" },
+        { time: "3PM", name: "Ian Eric" },
+        { time: "7PM", name: "Swinging Jugs" },
       ],
     },
     {
-      date: "Sat June 20",
+      date: "Sat July 25th",
       acts: [
-        { time: "3PM", name: "Stilettos" },
-        { time: "7PM", name: "Jake Dean" },
+        { time: "3PM", name: "Velvet Crush" },
+        { time: "7PM", name: "Stereo Head" },
       ],
     },
     {
-      date: "Sat June 27",
+      date: "Sat August 1st",
       acts: [
-        { time: "3PM", name: "Doc Baldi" },
-        { time: "7PM", name: "Harry McGraw Trio" },
+        { time: "3PM", name: "Grunge Sponges" },
+        { time: "7PM", name: "Mike Malecker" },
       ],
     },
   ];
