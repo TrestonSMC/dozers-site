@@ -61,8 +61,8 @@ export default function Home() {
     {
       date: "Sat August 22nd",
       acts: [
-        { time: "3PM", name: "Stereo Head" },
-        { time: "7PM", name: "Ian Eric" },
+        { time: "3PM", name: "Ian Eric" },
+        { time: "7PM", name: "Stereo Head" },
       ],
     },
   ];
