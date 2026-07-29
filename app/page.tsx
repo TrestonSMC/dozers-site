@@ -38,31 +38,31 @@ export default function Home() {
 
   const liveMusicSchedule = [
     {
-      date: "Sat July 11th",
-      acts: [
-        { time: "3PM", name: "Worlds Smallest Quartet" },
-        { time: "7PM", name: "Doc Baldi" },
-      ],
-    },
-    {
-      date: "Sat July 18th",
-      acts: [
-        { time: "3PM", name: "Ian Eric" },
-        { time: "7PM", name: "Swinging Jugs" },
-      ],
-    },
-    {
-      date: "Sat July 25th",
-      acts: [
-        { time: "3PM", name: "Velvet Crush" },
-        { time: "7PM", name: "Stereo Head" },
-      ],
-    },
-    {
       date: "Sat August 1st",
       acts: [
-        { time: "3PM", name: "Grunge Sponges" },
-        { time: "7PM", name: "Mike Malecker" },
+        { time: "3PM", name: "Jay and Stee Duo" },
+        { time: "7PM", name: "Poor Barbie" },
+      ],
+    },
+    {
+      date: "Sat August 8th",
+      acts: [
+        { time: "3PM", name: "Doc Baldi" },
+        { time: "7PM", name: "Aaron Loveless" },
+      ],
+    },
+    {
+      date: "Sat August 15th",
+      acts: [
+        { time: "3PM", name: "All Strummed Out" },
+        { time: "7PM", name: "Jay and Stee Duo" },
+      ],
+    },
+    {
+      date: "Sat August 22nd",
+      acts: [
+        { time: "3PM", name: "Stereo Head" },
+        { time: "7PM", name: "Ian Eric" },
       ],
     },
   ];
