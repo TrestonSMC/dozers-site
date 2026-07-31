@@ -61,8 +61,8 @@ export default function Home() {
     {
       date: "Sat August 22nd",
       acts: [
-        { time: "3PM", name: "Ian Eric" },
-        { time: "7PM", name: "Stereo Head" },
+        { time: "3PM", name: "Stereo Head" },
+        { time: "7PM", name: "Harry McGraw Band" },
       ],
     },
   ];
@@ -209,6 +209,7 @@ export default function Home() {
                 { label: "Events", href: "/events" },
                 { label: "Live Music", href: "/live-music" },
                 { label: "Contact", href: "/contact" },
+                {label: "Careers", href: "/careers"},
               ].map((item) => (
                 <li key={item.href}>
                   <Link
