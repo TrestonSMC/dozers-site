@@ -38,31 +38,31 @@ export default function Home() {
 
   const liveMusicSchedule = [
     {
-      date: "Sat August 1st",
+      date: "Sat August 29th",
       acts: [
-        { time: "3PM", name: "Jay and Stee Duo" },
-        { time: "7PM", name: "Poor Barbie" },
+        { time: "3PM", name: "Velvet Crush" },
+        { time: "7PM", name: "Double G's" },
       ],
     },
     {
-      date: "Sat August 8th",
+      date: "Sat September 5th",
       acts: [
-        { time: "3PM", name: "Doc Baldi" },
-        { time: "7PM", name: "Aaron Loveless" },
+        { time: "3PM", name: "The B Sides" },
+        { time: "7PM", name: "All Strummed Out" },
       ],
     },
     {
-      date: "Sat August 15th",
+      date: "Sat September 12th",
       acts: [
-        { time: "3PM", name: "All Strummed Out" },
-        { time: "7PM", name: "Jay and Stee Duo" },
+        { time: "3PM", name: "Arizona Ave" },
+        { time: "7PM", name: "The Stilletos" },
       ],
     },
     {
-      date: "Sat August 22nd",
+      date: "Sat September 19th",
       acts: [
-        { time: "3PM", name: "Stereo Head" },
-        { time: "7PM", name: "Harry McGraw Band" },
+        { time: "3PM", name: "Velvet Crush" },
+        { time: "7PM", name: "Mick Yard" },
       ],
     },
   ];
