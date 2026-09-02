@@ -3,6 +3,7 @@ import {
   BarChart3,
   ExternalLink,
   LogOut,
+  Menu,
   Music2,
 } from "lucide-react";
 import { logout } from "../actions";
@@ -26,7 +27,7 @@ export default function AdminDashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[#080b0f] text-white">
+    <div className="min-h-screen max-w-full overflow-x-hidden bg-[#080b0f] text-white">
       {/* Desktop sidebar */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-white/10 bg-[#0c1117] lg:flex">
         <div className="border-b border-white/10 px-6 py-6">
@@ -69,73 +70,89 @@ export default function AdminDashboardLayout({
         </div>
       </aside>
 
-      {/* Main admin area */}
-      <div className="lg:pl-64">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-white/10 bg-[#080b0f]/95 px-4 backdrop-blur-xl sm:h-20 sm:px-8">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#29C3FF] sm:text-xs">
-              Dozers Grill
-            </p>
+      <div className="min-w-0 max-w-full lg:pl-64">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-white/10 bg-[#080b0f]/95 px-3 backdrop-blur-xl sm:h-20 sm:px-8">
+          <div className="flex min-w-0 items-center gap-3">
+            {/* Mobile dropdown */}
+            <details className="group relative lg:hidden">
+              <summary className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-gray-300 transition hover:border-[#29C3FF]/40 hover:text-[#29C3FF] [&::-webkit-details-marker]:hidden">
+                <Menu className="h-5 w-5" />
+              </summary>
 
-            <p className="mt-1 text-sm font-semibold text-white sm:text-base">
-              Admin Panel
-            </p>
+              <div className="absolute left-0 top-12 z-50 w-56 overflow-hidden rounded-2xl border border-white/10 bg-[#0c1117] p-2 shadow-2xl">
+                <div className="border-b border-white/10 px-3 py-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#29C3FF]">
+                    Dozers Grill
+                  </p>
+
+                  <p className="mt-1 text-sm font-semibold text-white">
+                    Admin Menu
+                  </p>
+                </div>
+
+                <nav className="space-y-1 py-2">
+                  {navigation.map((item) => {
+                    const Icon = item.icon;
+
+                    return (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-gray-300 transition hover:bg-[#29C3FF]/10 hover:text-[#29C3FF]"
+                      >
+                        <Icon className="h-5 w-5" />
+                        {item.name}
+                      </Link>
+                    );
+                  })}
+                </nav>
+
+                <form
+                  action={logout}
+                  className="border-t border-white/10 pt-2"
+                >
+                  <button
+                    type="submit"
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-red-300 transition hover:bg-red-500/10"
+                  >
+                    <LogOut className="h-5 w-5" />
+                    Sign Out
+                  </button>
+                </form>
+              </div>
+            </details>
+
+            <div className="min-w-0">
+              <p className="truncate text-[10px] font-bold uppercase tracking-[0.2em] text-[#29C3FF] sm:text-xs">
+                Dozers Grill
+              </p>
+
+              <p className="truncate text-sm font-semibold text-white sm:mt-1 sm:text-base">
+                Admin Panel
+              </p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Link
-              href="/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-xs font-semibold text-gray-300 transition hover:border-[#29C3FF]/40 hover:text-[#29C3FF] sm:px-4 sm:text-sm"
-            >
-              <ExternalLink className="h-4 w-4" />
+          <Link
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-xs font-semibold text-gray-300 transition hover:border-[#29C3FF]/40 hover:text-[#29C3FF] sm:px-4 sm:text-sm"
+          >
+            <ExternalLink className="h-4 w-4" />
 
-              <span className="hidden sm:inline">
-                View Website
-              </span>
+            <span className="hidden sm:inline">
+              View Website
+            </span>
 
-              <span className="sm:hidden">
-                Website
-              </span>
-            </Link>
-
-            <form action={logout} className="lg:hidden">
-              <button
-                type="submit"
-                aria-label="Sign out"
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 text-gray-400 transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
-              >
-                <LogOut className="h-4 w-4" />
-              </button>
-            </form>
-          </div>
+            <span className="sm:hidden">Website</span>
+          </Link>
         </header>
 
-        <main className="p-4 pb-28 sm:p-6 sm:pb-28 lg:p-8 lg:pb-8">
+        <main className="min-w-0 max-w-full overflow-x-hidden p-4 sm:p-6 lg:p-8">
           {children}
         </main>
       </div>
-
-      {/* Mobile navigation */}
-      <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-[#0c1117]/95 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-xl lg:hidden">
-        <div className="mx-auto grid max-w-md grid-cols-2 gap-2">
-          {navigation.map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="flex flex-col items-center justify-center gap-1 rounded-xl px-3 py-2.5 text-xs font-semibold text-gray-400 transition hover:bg-[#29C3FF]/10 hover:text-[#29C3FF] active:scale-95"
-              >
-                <Icon className="h-5 w-5" />
-                {item.name}
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
     </div>
   );
 }
