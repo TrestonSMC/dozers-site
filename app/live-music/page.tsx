@@ -1,314 +1,430 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { CalendarDays, Clock, MapPin, Music2 } from "lucide-react";
+import {
+  CalendarDays,
+  Clock,
+  MapPin,
+  Music2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/client";
 
-const liveShows = [
-  {
-    day: "29",
-    month: "AUGUST",
-    weekday: "Saturday",
-    title: "Velvet Crush",
-    date: "Saturday, August 29th",
-    time: "3:00 PM",
-    desc: "Kick off the afternoon with live local music, cold drinks, and Dozer’s weekend energy.",
-    tags: ["Afternoon Show", "No Cover", "Local Talent"],
-    accent: "#F59E0B",
-    image: "/images/live-music/velvet-crush-aug29.jpg",
-  },
-  {
-    day: "29",
-    month: "AUGUST",
-    weekday: "Saturday",
-    title: "Double G's",
-    date: "Saturday, August 29th",
-    time: "7:00 PM",
-    desc: "Keep the night going with a high-energy evening set on the Stage @ Dozer’s.",
-    tags: ["Evening Show", "Cold Drinks", "Good Times"],
-    accent: "#29C3FF",
-    image: "/images/live-music/double-gs-aug29.jpg",
-  },
-  {
-    day: "5",
-    month: "September",
-    weekday: "Saturday",
-    title: "The B Side",
-    date: "Saturday, September 5th",
-    time: "3:00 PM",
-    desc: "Arizona Avenue brings live music, familiar favorites, and weekend patio vibes.",
-    tags: ["Live Band", "Patio Vibes", "Weekend"],
-    accent: "#10B981",
-    image: "/images/live-music/the-b-side.jpg",
-  },
-  {
-    day: "5",
-    month: "September",
-    weekday: "Saturday",
-    title: "All Strummed Out",
-    date: "Saturday, September 5th",
-    time: "7:00 PM",
-    desc: "An evening show built for drinks, dinner, and hanging out with your crew.",
-    tags: ["Evening Show", "Dinner & Drinks", "Local Talent"],
-    accent: "#F59E0B",
-    image: "/images/live-music/all-strummed-out-sep5.jpg",
-  },
-  {
-    day: "12",
-    month: "September",
-    weekday: "Saturday",
-    title: "Arizona Ave",
-    date: "Saturday, September 12th",
-    time: "3:00 PM",
-    desc: "Feel-good music and afternoon energy to start your Saturday right.",
-    tags: ["Afternoon Show", "Local Music", "Dozer’s Stage"],
-    accent: "#29C3FF",
-    image: "/images/live-music/arizona-ave-sep12.jpg",
-  },
-  {
-    day: "12",
-    month: "September",
-    weekday: "Saturday",
-    title: "The Stilletos",
-    date: "Saturday, September 12th",
-    time: "7:00 PM",
-    desc: "Jake Dean takes the stage for a Saturday night set at Dozer’s Grill.",
-    tags: ["Saturday Night", "Cold Drinks", "No Cover"],
-    accent: "#10B981",
-    image: "/images/live-music/the-stilletos-sep12.jpg",
-  },
-  {
-    day: "19",
-    month: "September",
-    weekday: "Saturday",
-    title: "Velvet Crush",
-    date: "Saturday, September 19th",
-    time: "3:00 PM",
-    desc: "Classic sounds, cold drinks, and a laid-back afternoon at Dozer’s.",
-    tags: ["Classic Hits", "Afternoon Show", "Cold Drinks"],
-    accent: "#F59E0B",
-    image: "/images/live-music/velvet-crush-sep19.jpg",
-  },
-  {
-    day: "19",
-    month: "September",
-    weekday: "Saturday",
-    title: "Mick Yard",
-    date: "Saturday, September 19th",
-    time: "7:00 PM",
-    desc: "Cold Drinks, Entertainment, and good vibes to start your weekend off right.",
-    tags: ["Trio", "Evening Show", "Good Times"],
-    accent: "#29C3FF",
-    image: "/images/live-music/mick-yard-sep19.jpg",
-  },
-];
+type LiveMusicShow = {
+  id: string;
+  title: string;
+  show_date: string;
+  show_time: string;
+  description: string;
+  tags: string[];
+  accent_color: string;
+  poster_url: string;
+};
+
+function createLocalDate(value: string) {
+  return new Date(`${value}T12:00:00`);
+}
+
+function formatDay(value: string) {
+  return String(createLocalDate(value).getDate());
+}
+
+function formatMonth(value: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+  })
+    .format(createLocalDate(value))
+    .toUpperCase();
+}
+
+function formatWeekday(value: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+  }).format(createLocalDate(value));
+}
+
+function formatFullDate(value: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  }).format(createLocalDate(value));
+}
+
+function formatTime(value: string) {
+  const [hours, minutes] = value.split(":");
+  const date = new Date();
+
+  date.setHours(Number(hours), Number(minutes), 0, 0);
+
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+}
+
+function getTodayDate() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(
+    2,
+    "0"
+  );
+  const day = String(today.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
 
 export default function LiveMusicPage() {
+  const supabase = useMemo(() => createClient(), []);
+
+  const [shows, setShows] = useState<LiveMusicShow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+
+  useEffect(() => {
+    async function loadShows() {
+      setLoading(true);
+      setLoadError("");
+
+      const { data, error } = await supabase
+        .from("live_music_shows")
+        .select(
+          `
+            id,
+            title,
+            show_date,
+            show_time,
+            description,
+            tags,
+            accent_color,
+            poster_url
+          `
+        )
+        .eq("is_published", true)
+        .gte("show_date", getTodayDate())
+        .order("show_date", { ascending: true })
+        .order("show_time", { ascending: true });
+
+      if (error) {
+        console.error("LIVE MUSIC LOAD ERROR:", error);
+        setLoadError(
+          "The upcoming lineup could not be loaded."
+        );
+        setLoading(false);
+        return;
+      }
+
+      setShows((data ?? []) as LiveMusicShow[]);
+      setLoading(false);
+    }
+
+    loadShows();
+  }, [supabase]);
+
   return (
-    <main className="min-h-screen bg-[#0d1117] text-gray-100 overflow-hidden">
+    <main className="min-h-screen overflow-hidden bg-[#0d1117] text-gray-100">
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_top_left,rgba(41,195,255,0.18),transparent_35%),radial-gradient(circle_at_top_right,rgba(245,158,11,0.18),transparent_35%),linear-gradient(to_bottom,#0d1117,#05070a)]" />
 
-{/* HEADER */}
-<header className="fixed top-0 left-0 w-full flex justify-between items-center px-6 md:px-10 py-6 backdrop-blur-md bg-[#0d1117]/70 border-b border-[#29C3FF]/20 z-50">
-  <Link href="/" aria-label="Home">
-    <Image
-      src="/images/dozers-logo.png"
-      alt="Dozers Logo"
-      width={140}
-      height={60}
-      priority
-    />
-  </Link>
+      <header className="fixed left-0 top-0 z-50 flex w-full items-center justify-between border-b border-[#29C3FF]/20 bg-[#0d1117]/70 px-6 py-6 backdrop-blur-md md:px-10">
+        <Link href="/" aria-label="Home">
+          <Image
+            src="/images/dozers-logo.png"
+            alt="Dozers Logo"
+            width={140}
+            height={60}
+            priority
+          />
+        </Link>
 
-  <Link
-    href="/"
-    className="text-[#29C3FF] px-5 py-2 rounded-full border border-[#29C3FF]/50 hover:bg-[#29C3FF]/20 transition"
-  >
-    Home
-  </Link>
-</header>
+        <Link
+          href="/"
+          className="rounded-full border border-[#29C3FF]/50 px-5 py-2 text-[#29C3FF] transition hover:bg-[#29C3FF]/20"
+        >
+          Home
+        </Link>
+      </header>
 
-      {/* HERO */}
-      <section className="relative z-10 px-6 py-24 md:py-32 border-b border-white/10">
-        <div className="mx-auto max-w-7xl grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
+      <section className="relative z-10 border-b border-white/10 px-6 pb-24 pt-36 md:pb-32 md:pt-44">
+        <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
-            <p className="uppercase tracking-[0.35em] text-[#F59E0B] text-sm mb-5">
+            <p className="mb-5 text-sm uppercase tracking-[0.35em] text-[#F59E0B]">
               Stage @ Dozer’s
             </p>
 
-            <h1 className="text-5xl md:text-7xl font-black uppercase leading-none text-white drop-shadow-[0_0_30px_rgba(245,158,11,0.45)]">
+            <h1 className="text-5xl font-black uppercase leading-none text-white drop-shadow-[0_0_30px_rgba(245,158,11,0.45)] md:text-7xl">
               Live Music
-              <span className="block text-[#F59E0B]">Every Saturday</span>
+              <span className="block text-[#F59E0B]">
+                Every Saturday
+              </span>
             </h1>
 
-            <p className="mt-7 text-lg md:text-xl text-gray-300 max-w-2xl leading-relaxed">
-              Starting in June, Dozer’s Grill is bringing live local music to
-              Mesa every Saturday with afternoon and evening performances.
+            <p className="mt-7 max-w-2xl text-lg leading-relaxed text-gray-300 md:text-xl">
+              Dozer’s Grill brings live local music to
+              Mesa every Saturday with afternoon and
+              evening performances.
             </p>
           </div>
 
           <div className="rounded-3xl border border-[#F59E0B]/30 bg-[#111827]/80 p-8 shadow-[0_0_45px_-12px_rgba(245,158,11,0.55)]">
-            <Music2 className="h-12 w-12 text-[#F59E0B] mb-6" />
-            <h2 className="text-3xl font-[Playfair_Display] text-white mb-4">
+            <Music2 className="mb-6 h-12 w-12 text-[#F59E0B]" />
+
+            <h2 className="mb-4 text-3xl font-[Playfair_Display] text-white">
               Cold Drinks. Good Food. Live Music.
             </h2>
-            <p className="text-gray-300 leading-relaxed">
-              Come early for food and drinks, stay late for the music. No
-              complicated plans — just a good Saturday at Dozer’s.
+
+            <p className="leading-relaxed text-gray-300">
+              Come early for food and drinks, stay late
+              for the music. No complicated plans—just a
+              good Saturday at Dozer’s.
             </p>
 
             <div className="mt-8 space-y-4 text-gray-300">
               <div className="flex gap-3">
-                <MapPin className="h-5 w-5 text-[#29C3FF]" />
-                <span>7012 E Hampton Ave, Mesa, AZ 85209</span>
+                <MapPin className="h-5 w-5 shrink-0 text-[#29C3FF]" />
+                <span>
+                  7012 E Hampton Ave, Mesa, AZ 85209
+                </span>
               </div>
+
               <div className="flex gap-3">
-                <Clock className="h-5 w-5 text-[#29C3FF]" />
-                <span>Shows at 3:00 PM and 7:00 PM</span>
+                <Clock className="h-5 w-5 shrink-0 text-[#29C3FF]" />
+                <span>
+                  Afternoon and evening performances
+                </span>
               </div>
+
               <div className="flex gap-3">
-                <CalendarDays className="h-5 w-5 text-[#29C3FF]" />
-                <span>Every Saturday in June</span>
+                <CalendarDays className="h-5 w-5 shrink-0 text-[#29C3FF]" />
+                <span>Live music every Saturday</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* LINEUP */}
-      <section id="lineup" className="relative z-10 px-6 py-24">
+      <section
+        id="lineup"
+        className="relative z-10 px-6 py-24"
+      >
         <div className="mx-auto max-w-7xl">
-          <div className="text-center mb-14">
-            <p className="uppercase tracking-[0.35em] text-[#29C3FF] text-sm mb-4">
+          <div className="mb-14 text-center">
+            <p className="mb-4 text-sm uppercase tracking-[0.35em] text-[#29C3FF]">
               Upcoming Shows
             </p>
-            <h2 className="text-4xl md:text-5xl font-[Playfair_Display] text-white">
-              July Lineup
+
+            <h2 className="text-4xl font-[Playfair_Display] text-white md:text-5xl">
+              Live Music Lineup
             </h2>
           </div>
 
-          <div className="space-y-12">
-            {liveShows.map((show, i) => (
-              <motion.article
-                key={`${show.title}-${show.time}`}
-                initial={{ opacity: 0, y: 22 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.04 }}
-                className="grid lg:grid-cols-[420px_1fr] gap-10 items-stretch rounded-3xl border bg-[#111827]/75 p-6 md:p-8 backdrop-blur-md overflow-hidden"
-                style={{
-                  borderColor: `${show.accent}55`,
-                  boxShadow: `0 0 45px -14px ${show.accent}`,
-                }}
-              >
-                {/* LEFT INFO */}
-                <div className="flex flex-col justify-between">
-                  <div>
-                    <div
-                      className="inline-flex flex-col rounded-2xl border px-6 py-5 bg-[#0d1117]/80 mb-8"
+          {loading && (
+            <div className="flex min-h-80 items-center justify-center rounded-3xl border border-white/10 bg-[#111827]/60">
+              <div className="text-center">
+                <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-[#29C3FF]" />
+
+                <p className="mt-4 text-sm text-gray-500">
+                  Loading upcoming shows...
+                </p>
+              </div>
+            </div>
+          )}
+
+          {!loading && loadError && (
+            <div className="rounded-3xl border border-red-500/30 bg-red-500/10 px-6 py-12 text-center text-red-200">
+              {loadError}
+            </div>
+          )}
+
+          {!loading &&
+            !loadError &&
+            shows.length === 0 && (
+              <div className="flex min-h-80 flex-col items-center justify-center rounded-3xl border border-white/10 bg-[#111827]/60 px-6 text-center">
+                <Music2 className="h-12 w-12 text-[#29C3FF]" />
+
+                <h3 className="mt-5 text-2xl font-bold text-white">
+                  More shows coming soon
+                </h3>
+
+                <p className="mt-2 max-w-md text-gray-400">
+                  Check back soon for the next live music
+                  lineup at Dozer’s Grill.
+                </p>
+              </div>
+            )}
+
+          {!loading &&
+            !loadError &&
+            shows.length > 0 && (
+              <div className="space-y-12">
+                {shows.map((show, index) => {
+                  const accent =
+                    show.accent_color || "#29C3FF";
+
+                  return (
+                    <motion.article
+                      key={show.id}
+                      initial={{
+                        opacity: 0,
+                        y: 22,
+                      }}
+                      whileInView={{
+                        opacity: 1,
+                        y: 0,
+                      }}
+                      viewport={{
+                        once: true,
+                        amount: 0.1,
+                      }}
+                      transition={{
+                        duration: 0.4,
+                        delay: Math.min(
+                          index * 0.04,
+                          0.2
+                        ),
+                      }}
+                      className="grid items-stretch gap-10 overflow-hidden rounded-3xl border bg-[#111827]/75 p-6 backdrop-blur-md md:p-8 lg:grid-cols-[420px_1fr]"
                       style={{
-                        borderColor: `${show.accent}80`,
-                        boxShadow: `0 0 25px -12px ${show.accent}`,
+                        borderColor: `${accent}55`,
+                        boxShadow:
+                          `0 0 45px -14px ${accent}`,
                       }}
                     >
-                      <span
-                        className="text-sm uppercase tracking-[0.25em] font-bold"
-                        style={{ color: show.accent }}
-                      >
-                        {show.weekday}
-                      </span>
+                      <div className="flex flex-col justify-between">
+                        <div>
+                          <div
+                            className="mb-8 inline-flex flex-col rounded-2xl border bg-[#0d1117]/80 px-6 py-5"
+                            style={{
+                              borderColor:
+                                `${accent}80`,
+                              boxShadow:
+                                `0 0 25px -12px ${accent}`,
+                            }}
+                          >
+                            <span
+                              className="text-sm font-bold uppercase tracking-[0.25em]"
+                              style={{ color: accent }}
+                            >
+                              {formatWeekday(
+                                show.show_date
+                              )}
+                            </span>
 
-                      <span
-                        className="text-lg uppercase font-black mt-2"
-                        style={{ color: show.accent }}
-                      >
-                        {show.month}
-                      </span>
+                            <span
+                              className="mt-2 text-lg font-black uppercase"
+                              style={{ color: accent }}
+                            >
+                              {formatMonth(
+                                show.show_date
+                              )}
+                            </span>
 
-                      <span className="text-7xl font-black text-white leading-none mt-2">
-                        {show.day}
-                      </span>
-                    </div>
+                            <span className="mt-2 text-7xl font-black leading-none text-white">
+                              {formatDay(show.show_date)}
+                            </span>
+                          </div>
 
-                    <h3
-                      className="text-4xl md:text-5xl font-black uppercase leading-none mb-6"
-                      style={{ color: show.accent }}
-                    >
-                      {show.title}
-                    </h3>
+                          <h3
+                            className="mb-6 text-4xl font-black uppercase leading-none md:text-5xl"
+                            style={{ color: accent }}
+                          >
+                            {show.title}
+                          </h3>
 
-                    <div className="space-y-4 text-gray-300 mb-8">
-                      <div className="flex items-center gap-3">
-                        <CalendarDays className="h-5 w-5 text-[#29C3FF]" />
-                        <span>{show.date}</span>
+                          <div className="mb-8 space-y-4 text-gray-300">
+                            <div className="flex items-center gap-3">
+                              <CalendarDays className="h-5 w-5 shrink-0 text-[#29C3FF]" />
+
+                              <span>
+                                {formatFullDate(
+                                  show.show_date
+                                )}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                              <Clock className="h-5 w-5 shrink-0 text-[#29C3FF]" />
+
+                              <span>
+                                {formatTime(
+                                  show.show_time
+                                )}
+                              </span>
+                            </div>
+                          </div>
+
+                          {show.description && (
+                            <p className="text-lg leading-relaxed text-gray-300">
+                              {show.description}
+                            </p>
+                          )}
+                        </div>
+
+                        {show.tags?.length > 0 && (
+                          <div className="mt-8 flex flex-wrap gap-3">
+                            {show.tags.map((tag) => (
+                              <span
+                                key={tag}
+                                className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs uppercase tracking-wider text-gray-300"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
-                      <div className="flex items-center gap-3">
-                        <Clock className="h-5 w-5 text-[#29C3FF]" />
-                        <span>{show.time}</span>
-                      </div>
-                    </div>
-
-                    <p className="text-gray-300 leading-relaxed text-lg">
-                      {show.desc}
-                    </p>
-                  </div>
-
-                  <div className="mt-8 flex flex-wrap gap-3">
-                    {show.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs uppercase tracking-wider text-gray-300"
+                      <div
+                        className="relative flex min-h-[520px] items-center justify-center overflow-hidden rounded-2xl border bg-[#05070a] p-4 md:p-6 lg:min-h-[720px]"
+                        style={{
+                          borderColor: `${accent}55`,
+                          boxShadow:
+                            `0 0 40px -14px ${accent}`,
+                        }}
                       >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                        <div
+                          className="absolute inset-0 scale-110 opacity-30 blur-3xl"
+                          style={{
+                            background:
+                              `radial-gradient(circle, ${accent}55 0%, transparent 70%)`,
+                          }}
+                        />
 
-                {/* BIG POSTER */}
-                <div
-                  className="relative flex items-center justify-center min-h-[520px] lg:min-h-[720px] rounded-2xl overflow-hidden border bg-[#05070a] p-4 md:p-6"
-                  style={{
-                    borderColor: `${show.accent}55`,
-                    boxShadow: `0 0 40px -14px ${show.accent}`,
-                  }}
-                >
-                  <div
-                    className="absolute inset-0 opacity-30 blur-3xl scale-110"
-                    style={{
-                      background: `radial-gradient(circle, ${show.accent}55 0%, transparent 70%)`,
-                    }}
-                  />
+                        <div className="relative flex h-full w-full items-center justify-center">
+                          <img
+                            src={show.poster_url}
+                            alt={`${show.title} poster`}
+                            loading={
+                              index < 2
+                                ? "eager"
+                                : "lazy"
+                            }
+                            className="h-auto max-h-[680px] w-auto rounded-xl object-contain shadow-[0_0_40px_rgba(0,0,0,0.55)] lg:max-h-[820px]"
+                          />
+                        </div>
 
-                  <div className="relative w-full h-full flex items-center justify-center">
-                    <Image
-                      src={show.image}
-                      alt={`${show.title} poster`}
-                      width={900}
-                      height={1400}
-                      className="w-auto h-auto max-h-[680px] lg:max-h-[820px] object-contain rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.55)]"
-                      priority={i < 2}
-                    />
-                  </div>
-
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#05070a]/10 via-transparent to-transparent pointer-events-none" />
-                </div>
-              </motion.article>
-            ))}
-          </div>
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#05070a]/10 via-transparent to-transparent" />
+                      </div>
+                    </motion.article>
+                  );
+                })}
+              </div>
+            )}
         </div>
       </section>
 
-      {/* CTA */}
       <section className="relative z-10 px-6 pb-24">
         <div className="mx-auto max-w-5xl rounded-3xl border border-[#10B981]/30 bg-[#111827]/80 p-10 text-center shadow-[0_0_35px_-12px_rgba(16,185,129,0.5)]">
-          <h2 className="text-4xl font-[Playfair_Display] text-white mb-4">
+          <h2 className="mb-4 text-4xl font-[Playfair_Display] text-white">
             Make It A Dozer’s Night
           </h2>
-          <p className="text-gray-300 mb-8">
-            Grab your crew, come hungry, and stay for the show.
+
+          <p className="mb-8 text-gray-300">
+            Grab your crew, come hungry, and stay for the
+            show.
           </p>
 
           <a
@@ -316,7 +432,7 @@ export default function LiveMusicPage() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Button className="border-0 text-white bg-gradient-to-r from-[#10B981] to-[#29C3FF] px-10 py-5 rounded-full text-lg tracking-wider hover:scale-105 transition-transform">
+            <Button className="rounded-full border-0 bg-gradient-to-r from-[#10B981] to-[#29C3FF] px-10 py-5 text-lg tracking-wider text-white transition-transform hover:scale-105">
               Get Directions
             </Button>
           </a>
