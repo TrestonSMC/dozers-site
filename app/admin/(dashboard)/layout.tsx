@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   BarChart3,
   ExternalLink,
+  Images,
   LogOut,
   Menu,
   Music2,
@@ -18,6 +19,11 @@ const navigation = [
     name: "Live Music",
     href: "/admin/live-music",
     icon: Music2,
+  },
+  {
+    name: "Gallery",
+    href: "/admin/gallery",
+    icon: Images,
   },
 ];
 
@@ -145,7 +151,9 @@ export default function AdminDashboardLayout({
               View Website
             </span>
 
-            <span className="sm:hidden">Website</span>
+            <span className="sm:hidden">
+              Website
+            </span>
           </Link>
         </header>
 
