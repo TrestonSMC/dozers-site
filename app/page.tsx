@@ -36,6 +36,33 @@ type HomepageSchedule = {
   }[];
 };
 
+const CONTACT_EMAILS = [
+  {
+    label: "Events",
+    description:
+      "Upcoming events, private gatherings, and event questions.",
+    email: "events@dozersgrill.com",
+  },
+  {
+    label: "Employment",
+    description:
+      "Employment opportunities and staffing questions.",
+    email: "staffing@dozersgrill.com",
+  },
+  {
+    label: "Live Entertainment",
+    description:
+      "Bands, performers, booking, and stage inquiries.",
+    email: "stage@dozersgrill.com",
+  },
+  {
+    label: "Accounts Payable",
+    description:
+      "Vendor invoices and accounts payable inquiries.",
+    email: "ap@dozersgrill.com",
+  },
+];
+
 function getOrdinalSuffix(day: number) {
   if (day >= 11 && day <= 13) {
     return "th";
@@ -613,7 +640,7 @@ export default function Home() {
                       transition={{
                         duration: 0.4,
                       }}
-                      className="rounded-xl border bg-[#1a1f2a]/80 p-8 backdrop-blur-md transition-transform hover hover:scale-[1.02]"
+                      className="rounded-xl border bg-[#1a1f2a]/80 p-8 backdrop-blur-md transition-transform hover:scale-[1.02]"
                       style={{
                         borderColor: `${color}40`,
                         boxShadow:
@@ -658,47 +685,97 @@ export default function Home() {
 
       <section
         id="contact"
-        className="border-t-t border-[#F59E0B]/20 bg-[#111827]/70 px-6 py-24 backdrop-blur-md md:px-20"
+        className="border-t border-[#F59E0B]/20 bg-[#111827]/70 px-6 py-24 backdrop-blur-md md:px-20"
       >
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-10 md:flex-row">
-          <div className="flex-1 text-center md:text-left">
-            <h2 className="mb-6 text-4xl font-[Playfair_Display] text-white drop-shadow-[0_0_25px_rgba(245,158,11,0.4)]">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-12 text-center">
+            <h2 className="mb-4 text-4xl font-[Playfair_Display] text-white drop-shadow-[0_0_25px_rgba(245,158,11,0.4)] md:text-5xl">
               Visit Dozers Grill
             </h2>
 
-            <p className="mb-2 text-lg text-gray-300">
-              7012 E Hampton Ave, Mesa, AZ 85209
+            <p className="mx-auto max-w-2xl text-lg text-gray-300">
+              Stop by for great food, cold drinks, live
+              music, and events—or contact the
+              appropriate Dozers department below.
             </p>
-
-            <p className="mb-2 text-lg text-gray-300">
-              (602) 694-5551
-            </p>
-
-            <p className="mb-8 text-sm text-gray-400">
-              Kitchen: Sun–Thurs 10 AM – 10 PM •
-              Fri–Sat 10 AM – 12 AM
-            </p>
-
-            <a
-              href="https://www.google.com/maps/search/?api=1&query=Dozers+Grill+7012+E+Hampton+Ave+Mesa+AZ+85209"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button className="rounded-full border-0 bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-8 py-4 text-white transition-transform hover:scale-105">
-                Get Directions
-              </Button>
-            </a>
           </div>
 
-          <div className="w-full flex-1 overflow-hidden rounded-2xl border border-[#29C3FF]/30 shadow-[0_0_25px_-5px_rgba(41,195,255,0.4)]">
-            <iframe
-              title="Dozers Grill Map"
-              src="https://www.google.com/maps?q=Dozers+Grill+Mesa+AZ&hl=en&z=15&output=embed"
-              width="100%"
-              height="400"
-              style={{ border: 0 }}
-              loading="lazy"
-            />
+          <div className="mb-12 grid gap-8 lg:grid-cols-2">
+            <div className="flex flex-col justify-center rounded-2xl border border-[#29C3FF]/20 bg-[#0d1117]/50 p-8 shadow-[0_0_25px_-5px_rgba(41,195,255,0.3)]">
+              <h3 className="mb-5 text-3xl font-[Playfair_Display] text-white">
+                Location & Hours
+              </h3>
+
+              <p className="mb-2 text-lg text-gray-300">
+                7012 E Hampton Ave
+                <br />
+                Mesa, AZ 85209
+              </p>
+
+              <a
+                href="tel:+16026945551"
+                className="mb-2 text-lg text-[#29C3FF] transition hover:text-[#F59E0B]"
+              >
+                (602) 694-5551
+              </a>
+
+              <p className="mb-8 text-sm text-gray-400">
+                Kitchen: Sun–Thurs 10 AM – 10 PM •
+                Fri–Sat 10 AM – 12 AM
+              </p>
+
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Dozers+Grill+7012+E+Hampton+Ave+Mesa+AZ+85209"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="self-start"
+              >
+                <Button className="rounded-full border-0 bg-gradient-to-r from-[#29C3FF] to-[#F59E0B] px-8 py-4 text-white transition-transform hover:scale-105">
+                  Get Directions
+                </Button>
+              </a>
+            </div>
+
+            <div className="w-full overflow-hidden rounded-2xl border border-[#29C3FF]/30 shadow-[0_0_25px_-5px_rgba(41,195,255,0.4)]">
+              <iframe
+                title="Dozers Grill Map"
+                src="https://www.google.com/maps?q=Dozers+Grill+Mesa+AZ&hl=en&z=15&output=embed"
+                width="100%"
+                height="400"
+                style={{ border: 0 }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="mb-8 text-center text-3xl font-[Playfair_Display] text-white drop-shadow-[0_0_25px_rgba(41,195,255,0.4)]">
+              Contact Us
+            </h3>
+
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {CONTACT_EMAILS.map((contact) => (
+                <a
+                  key={contact.email}
+                  href={`mailto:${contact.email}`}
+                  className="group flex min-h-[210px] flex-col items-center justify-center rounded-2xl border border-white/10 bg-[#0d1117]/50 p-6 text-center shadow-[0_0_20px_-8px_rgba(41,195,255,0.4)] transition duration-300 hover:-translate-y-1 hover:border-[#29C3FF]/50 hover:bg-[#29C3FF]/10 hover:shadow-[0_0_25px_-5px_rgba(41,195,255,0.5)]"
+                >
+                  <h4 className="mb-3 text-xl font-semibold text-white transition group-hover:text-[#F59E0B]">
+                    {contact.label}
+                  </h4>
+
+                  <p className="mb-4 text-sm leading-relaxed text-gray-400">
+                    {contact.description}
+                  </p>
+
+                  <span className="break-all text-sm font-semibold text-[#29C3FF] transition group-hover:text-white">
+                    {contact.email}
+                  </span>
+                </a>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -875,7 +952,8 @@ export default function Home() {
       <footer className="border-t border-[#29C3FF]/30 bg-[#0d1117]/80 px-6 py-8 text-center text-sm text-gray-400 backdrop-blur-md md:px-10">
         <div className="space-y-3">
           <p>
-            © 2026 Dozers Grill • All Rights Reserved
+            © {new Date().getFullYear()} Dozers Grill •
+            All Rights Reserved
           </p>
 
           <div className="flex flex-col items-center justify-center gap-4 text-[#29C3FF] sm:flex-row">
