@@ -7,22 +7,26 @@ import { motion } from "framer-motion";
 const CONTACT_EMAILS = [
   {
     label: "Events & Reservations",
-    description: "Questions about upcoming events and private gatherings.",
+    description:
+      "Questions about upcoming events and private gatherings.",
     email: "events@dozersgrill.com",
   },
   {
     label: "Employment Opportunities",
-    description: "Interested in joining the Dozers Grill team?",
+    description:
+      "Interested in joining the Dozers Grill team?",
     email: "staffing@dozersgrill.com",
   },
   {
     label: "Bands & Entertainment",
-    description: "Live music, performers, and entertainment inquiries.",
+    description:
+      "Live music, performers, and entertainment inquiries.",
     email: "stage@dozersgrill.com",
   },
   {
     label: "Vendor Invoices",
-    description: "Accounts payable and vendor invoice submissions.",
+    description:
+      "Accounts payable and vendor invoice submissions.",
     email: "ap@dozersgrill.com",
   },
 ];
@@ -50,7 +54,10 @@ export default function ContactPage() {
 
       {/* Header */}
       <header className="fixed left-0 top-0 z-50 flex w-full items-center justify-between border-b border-[#29C3FF]/20 bg-[#0d1117]/70 px-6 py-5 backdrop-blur-md md:px-8">
-        <Link href="/" aria-label="Return to the Dozers Grill homepage">
+        <Link
+          href="/"
+          aria-label="Return to the Dozers Grill homepage"
+        >
           <Image
             src="/images/dozers-logo.png"
             alt="Dozers Grill Logo"
@@ -107,7 +114,8 @@ export default function ContactPage() {
               </p>
 
               <p className="mt-1 text-sm text-gray-400">
-                Kitchen Hours: Mon–Thurs 4 PM–10 PM • Fri–Sun 10 AM–10 PM
+                Kitchen Hours: Mon–Thurs 4 PM–10 PM •
+                Fri–Sun 10 AM–10 PM
               </p>
             </div>
           </section>
@@ -139,6 +147,25 @@ export default function ContactPage() {
                 </a>
               ))}
             </div>
+
+            {/* Event submission */}
+            <div className="mt-8 rounded-xl border border-[#10B981]/30 bg-[#10B981]/5 p-6 text-center shadow-[0_0_25px_-8px_rgba(16,185,129,0.5)]">
+              <h3 className="text-xl font-semibold text-white">
+                Want to Host an Event at Dozers?
+              </h3>
+
+              <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-gray-400">
+                Send us your event information and our
+                team will review the details.
+              </p>
+
+              <Link
+                href="/submit-event"
+                className="mt-5 inline-flex rounded-full border border-[#10B981] bg-[#10B981]/10 px-8 py-4 text-lg font-medium tracking-wider text-[#10B981] shadow-[0_0_20px_-5px_rgba(16,185,129,0.6)] transition hover:scale-105 hover:bg-[#10B981]/20 hover:text-white"
+              >
+                Submit an Event
+              </Link>
+            </div>
           </section>
 
           {/* Map */}
@@ -161,11 +188,11 @@ export default function ContactPage() {
 
       {/* Footer */}
       <footer className="relative z-10 border-t border-[#29C3FF]/30 bg-[#0d1117]/80 px-6 py-6 text-center text-gray-400 backdrop-blur-md md:px-10">
-        © {new Date().getFullYear()} Dozers Grill • All Rights Reserved
+        © {new Date().getFullYear()} Dozers Grill • All
+        Rights Reserved
       </footer>
     </div>
   );
 }
-
 
 
