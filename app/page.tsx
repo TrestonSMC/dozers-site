@@ -391,8 +391,8 @@ export default function Home() {
                   href: "/gallery",
                 },
                 {
-                  label: "Events",
-                  href: "/events",
+                  label: "Event Submission",
+                  href: "/submit-event",
                 },
                 {
                   label: "Live Music",
