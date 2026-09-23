@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -36,7 +31,23 @@ type HomepageSchedule = {
   }[];
 };
 
-const CONTACT_EMAILS = [
+type ContactItem =
+  | {
+      label: string;
+      description: string;
+      email: string;
+      href?: never;
+      action?: never;
+    }
+  | {
+      label: string;
+      description: string;
+      href: string;
+      action: string;
+      email?: never;
+    };
+
+const CONTACT_ITEMS: ContactItem[] = [
   {
     label: "Events",
     description:
@@ -46,8 +57,9 @@ const CONTACT_EMAILS = [
   {
     label: "Employment",
     description:
-      "Employment opportunities and staffing questions.",
-    email: "staffing@dozersgrill.com",
+      "View employment opportunities and apply to join the Dozers team.",
+    href: "/careers",
+    action: "View Careers",
   },
   {
     label: "Live Entertainment",
@@ -103,8 +115,7 @@ function formatHomepageTime(value: string) {
 
   return new Intl.DateTimeFormat("en-US", {
     hour: "numeric",
-    minute:
-      Number(minutes) === 0 ? undefined : "2-digit",
+    minute: Number(minutes) === 0 ? undefined : "2-digit",
   })
     .format(date)
     .replace(" ", "");
@@ -113,12 +124,7 @@ function formatHomepageTime(value: string) {
 function getTodayDate() {
   const today = new Date();
   const year = today.getFullYear();
-
-  const month = String(today.getMonth() + 1).padStart(
-    2,
-    "0"
-  );
-
+  const month = String(today.getMonth() + 1).padStart(2, "0");
   const day = String(today.getDate()).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
@@ -128,11 +134,10 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [events, setEvents] = useState<any[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [loadingReviews, setLoadingReviews] =
-    useState(true);
-
-  const [liveMusicSchedule, setLiveMusicSchedule] =
-    useState<HomepageSchedule[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+  const [liveMusicSchedule, setLiveMusicSchedule] = useState<
+    HomepageSchedule[]
+  >([]);
 
   const supabase = useMemo(() => createClient(), []);
 
@@ -160,46 +165,33 @@ export default function Home() {
     async function loadLiveMusic() {
       const { data, error } = await supabase
         .from("live_music_shows")
-        .select(
-          `
-            id,
-            title,
-            show_date,
-            show_time
-          `
-        )
+        .select(`
+          id,
+          title,
+          show_date,
+          show_time
+        `)
         .eq("is_published", true)
         .gte("show_date", getTodayDate())
         .order("show_date", { ascending: true })
         .order("show_time", { ascending: true });
 
       if (error) {
-        console.error(
-          "HOMEPAGE LIVE MUSIC ERROR:",
-          error
-        );
-
+        console.error("HOMEPAGE LIVE MUSIC ERROR:", error);
         setLiveMusicSchedule([]);
         return;
       }
 
-      const groupedShows = new Map<
-        string,
-        HomepageLiveShow[]
-      >();
+      const groupedShows = new Map<string, HomepageLiveShow[]>();
 
-      for (const show of (data ??
-        []) as HomepageLiveShow[]) {
-        const existing =
-          groupedShows.get(show.show_date) ?? [];
+      for (const show of (data ?? []) as HomepageLiveShow[]) {
+        const existing = groupedShows.get(show.show_date) ?? [];
 
         existing.push(show);
         groupedShows.set(show.show_date, existing);
       }
 
-      const schedule = Array.from(
-        groupedShows.entries()
-      )
+      const schedule = Array.from(groupedShows.entries())
         .slice(0, 4)
         .map(([date, shows]) => ({
           date: formatHomepageDate(date),
@@ -231,18 +223,13 @@ export default function Home() {
             return false;
           }
 
-          const date = new Date(event.rawDate);
-          return date >= now;
+          return new Date(event.rawDate) >= now;
         });
 
         upcoming.sort(
           (
-            first: {
-              rawDate: string | number | Date;
-            },
-            second: {
-              rawDate: string | number | Date;
-            }
+            first: { rawDate: string | number | Date },
+            second: { rawDate: string | number | Date }
           ) =>
             new Date(first.rawDate).getTime() -
             new Date(second.rawDate).getTime()
@@ -280,38 +267,32 @@ export default function Home() {
           data?.data?.reviews ||
           [];
 
-        const normalizedReviews: Review[] =
-          incomingReviews
-            .map((review: any) => ({
-              author:
-                review.author ||
-                review.author_name ||
-                review.name ||
-                "Guest",
-              rating: getRating(review.rating),
-              text:
-                review.text || review.review || "",
-              time:
-                review.time ||
-                review.relative_time_description ||
-                "",
-              profile:
-                review.profile ||
-                review.profile_photo_url ||
-                "",
-            }))
-            .filter(
-              (review: Review) =>
-                review.text && review.rating > 0
-            );
+        const normalizedReviews: Review[] = incomingReviews
+          .map((review: any) => ({
+            author:
+              review.author ||
+              review.author_name ||
+              review.name ||
+              "Guest",
+            rating: getRating(review.rating),
+            text: review.text || review.review || "",
+            time:
+              review.time ||
+              review.relative_time_description ||
+              "",
+            profile:
+              review.profile ||
+              review.profile_photo_url ||
+              "",
+          }))
+          .filter(
+            (review: Review) =>
+              review.text && review.rating > 0
+          );
 
         setReviews(normalizedReviews);
       } catch (error) {
-        console.error(
-          "Failed to load reviews:",
-          error
-        );
-
+        console.error("Failed to load reviews:", error);
         setReviews([]);
       } finally {
         setLoadingReviews(false);
@@ -321,18 +302,10 @@ export default function Home() {
     fetchReviews();
   }, []);
 
-  const eventColors = [
-    "#29C3FF",
-    "#F59E0B",
-    "#10B981",
-  ];
+  const eventColors = ["#29C3FF", "#F59E0B", "#10B981"];
+  const insiderScrollRef = useRef<HTMLDivElement>(null);
 
-  const insiderScrollRef =
-    useRef<HTMLDivElement>(null);
-
-  const scrollInsider = (
-    direction: "left" | "right"
-  ) => {
+  const scrollInsider = (direction: "left" | "right") => {
     const element = insiderScrollRef.current;
 
     if (!element) {
@@ -345,8 +318,7 @@ export default function Home() {
     );
 
     element.scrollBy({
-      left:
-        direction === "left" ? -amount : amount,
+      left: direction === "left" ? -amount : amount,
       behavior: "smooth",
     });
   };
@@ -381,10 +353,7 @@ export default function Home() {
       <div className="fixed inset-0 z-0 bg-gradient-to-b from-transparent via-[#0d1117]/40 to-[#0d1117]/90" />
 
       <header className="fixed left-0 top-0 z-50 flex w-full items-center justify-between border-b border-[#29C3FF]/20 bg-[#0d1117]/70 px-8 py-5 backdrop-blur-md">
-        <Link
-          href="/"
-          aria-label="Dozers Grill Home"
-        >
+        <Link href="/" aria-label="Dozers Grill Home">
           <Image
             src="/images/dozers-logo.png"
             alt="Dozers Grill Logo"
@@ -405,18 +374,9 @@ export default function Home() {
           <div className="absolute right-8 top-full z-50 mt-2 w-64 rounded-xl border border-[#29C3FF]/30 bg-[#111827]/95 shadow-lg backdrop-blur-lg">
             <ul className="flex flex-col py-3 text-center text-sm uppercase tracking-wider">
               {[
-                {
-                  label: "About",
-                  href: "/about",
-                },
-                {
-                  label: "Menu",
-                  href: "/menu",
-                },
-                {
-                  label: "Gallery",
-                  href: "/gallery",
-                },
+                { label: "About", href: "/about" },
+                { label: "Menu", href: "/menu" },
+                { label: "Gallery", href: "/gallery" },
                 {
                   label: "Event Submission",
                   href: "/submit-event",
@@ -425,21 +385,13 @@ export default function Home() {
                   label: "Live Music",
                   href: "/live-music",
                 },
-                {
-                  label: "Contact",
-                  href: "/contact",
-                },
-                {
-                  label: "Careers",
-                  href: "/careers",
-                },
+                { label: "Contact", href: "/contact" },
+                { label: "Careers", href: "/careers" },
               ].map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    onClick={() =>
-                      setMenuOpen(false)
-                    }
+                    onClick={() => setMenuOpen(false)}
                     className="block w-full py-3 text-gray-300 transition hover:bg-[#29C3FF]/10 hover:text-[#F59E0B]"
                   >
                     {item.label}
@@ -532,57 +484,46 @@ export default function Home() {
             </div>
           ) : (
             <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-4">
-              {liveMusicSchedule.map(
-                (show, index) => (
-                  <motion.div
-                    key={show.date}
-                    initial={{
-                      opacity: 0,
-                      y: 25,
-                    }}
-                    whileInView={{
-                      opacity: 1,
-                      y: 0,
-                    }}
-                    viewport={{
-                      once: true,
-                      amount: 0.1,
-                    }}
-                    transition={{
-                      duration: 0.45,
-                      delay: index * 0.08,
-                    }}
-                    className="rounded-2xl border border-[#F59E0B]/20 bg-[#111827]/70 p-8 shadow-[0_0_30px_-8px_rgba(245,158,11,0.35)] backdrop-blur-md transition-transform hover:scale-[1.02]"
-                  >
-                    <div className="mb-6">
-                      <p className="mb-2 text-xs uppercase tracking-[0.25em] text-[#F59E0B]">
-                        Live Music
-                      </p>
+              {liveMusicSchedule.map((show, index) => (
+                <motion.div
+                  key={show.date}
+                  initial={{ opacity: 0, y: 25 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.1 }}
+                  transition={{
+                    duration: 0.45,
+                    delay: index * 0.08,
+                  }}
+                  className="rounded-2xl border border-[#F59E0B]/20 bg-[#111827]/70 p-8 shadow-[0_0_30px_-8px_rgba(245,158,11,0.35)] backdrop-blur-md transition-transform hover:scale-[1.02]"
+                >
+                  <div className="mb-6">
+                    <p className="mb-2 text-xs uppercase tracking-[0.25em] text-[#F59E0B]">
+                      Live Music
+                    </p>
 
-                      <h3 className="text-3xl font-[Playfair_Display] text-white">
-                        {show.date}
-                      </h3>
-                    </div>
+                    <h3 className="text-3xl font-[Playfair_Display] text-white">
+                      {show.date}
+                    </h3>
+                  </div>
 
-                    <div className="space-y-5">
-                      {show.acts.map((act) => (
-                        <div
-                          key={`${act.time}-${act.name}`}
-                          className="flex items-center justify-between gap-5 border-b border-white/10 pb-4 last:border-b-0 last:pb-0"
-                        >
-                          <span className="whitespace-nowrap font-semibold tracking-wide text-[#29C3FF]">
-                            {act.time}
-                          </span>
+                  <div className="space-y-5">
+                    {show.acts.map((act) => (
+                      <div
+                        key={`${act.time}-${act.name}`}
+                        className="flex items-center justify-between gap-5 border-b border-white/10 pb-4 last:border-b-0 last:pb-0"
+                      >
+                        <span className="whitespace-nowrap font-semibold tracking-wide text-[#29C3FF]">
+                          {act.time}
+                        </span>
 
-                          <span className="text-right font-medium text-gray-200">
-                            {act.name}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )
-              )}
+                        <span className="text-right font-medium text-gray-200">
+                          {act.name}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
             </div>
           )}
 
@@ -615,55 +556,40 @@ export default function Home() {
         ) : (
           <>
             <div className="mx-auto mb-16 grid max-w-6xl gap-10 md:grid-cols-3">
-              {events
-                .slice(0, 3)
-                .map((event, index) => {
-                  const color =
-                    eventColors[
-                      index % eventColors.length
-                    ];
+              {events.slice(0, 3).map((event, index) => {
+                const color =
+                  eventColors[index % eventColors.length];
 
-                  return (
-                    <motion.div
-                      key={event.id}
-                      initial={{
-                        opacity: 0,
-                        y: 20,
-                      }}
-                      whileInView={{
-                        opacity: 1,
-                        y: 0,
-                      }}
-                      viewport={{
-                        once: true,
-                      }}
-                      transition={{
-                        duration: 0.4,
-                      }}
-                      className="rounded-xl border bg-[#1a1f2a]/80 p-8 backdrop-blur-md transition-transform hover:scale-[1.02]"
-                      style={{
-                        borderColor: `${color}40`,
-                        boxShadow:
-                          `0 0 25px -5px ${color}`,
-                      }}
+                return (
+                  <motion.div
+                    key={event.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4 }}
+                    className="rounded-xl border bg-[#1a1f2a]/80 p-8 backdrop-blur-md transition-transform hover:scale-[1.02]"
+                    style={{
+                      borderColor: `${color}40`,
+                      boxShadow: `0 0 25px -5px ${color}`,
+                    }}
+                  >
+                    <h3
+                      className="mb-2 text-2xl font-semibold"
+                      style={{ color }}
                     >
-                      <h3
-                        className="mb-2 text-2xl font-semibold"
-                        style={{ color }}
-                      >
-                        {event.title}
-                      </h3>
+                      {event.title}
+                    </h3>
 
-                      <p className="mb-3 text-sm text-gray-400">
-                        {event.time}
-                      </p>
+                    <p className="mb-3 text-sm text-gray-400">
+                      {event.time}
+                    </p>
 
-                      <p className="text-base leading-relaxed text-gray-300">
-                        {event.desc}
-                      </p>
-                    </motion.div>
-                  );
-                })}
+                    <p className="text-base leading-relaxed text-gray-300">
+                      {event.desc}
+                    </p>
+                  </motion.div>
+                );
+              })}
             </div>
 
             <div className="flex flex-col items-center justify-center gap-6 sm:flex-row">
@@ -756,25 +682,50 @@ export default function Home() {
             </h3>
 
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {CONTACT_EMAILS.map((contact) => (
-                <a
-                  key={contact.email}
-                  href={`mailto:${contact.email}`}
-                  className="group flex min-h-[210px] flex-col items-center justify-center rounded-2xl border border-white/10 bg-[#0d1117]/50 p-6 text-center shadow-[0_0_20px_-8px_rgba(41,195,255,0.4)] transition duration-300 hover:-translate-y-1 hover:border-[#29C3FF]/50 hover:bg-[#29C3FF]/10 hover:shadow-[0_0_25px_-5px_rgba(41,195,255,0.5)]"
-                >
-                  <h4 className="mb-3 text-xl font-semibold text-white transition group-hover:text-[#F59E0B]">
-                    {contact.label}
-                  </h4>
+              {CONTACT_ITEMS.map((contact) => {
+                const cardClassName =
+                  "group flex min-h-[210px] flex-col items-center justify-center rounded-2xl border border-white/10 bg-[#0d1117]/50 p-6 text-center shadow-[0_0_20px_-8px_rgba(41,195,255,0.4)] transition duration-300 hover:-translate-y-1 hover:border-[#29C3FF]/50 hover:bg-[#29C3FF]/10 hover:shadow-[0_0_25px_-5px_rgba(41,195,255,0.5)]";
 
-                  <p className="mb-4 text-sm leading-relaxed text-gray-400">
-                    {contact.description}
-                  </p>
+                const content = (
+                  <>
+                    <h4 className="mb-3 text-xl font-semibold text-white transition group-hover:text-[#F59E0B]">
+                      {contact.label}
+                    </h4>
 
-                  <span className="break-all text-sm font-semibold text-[#29C3FF] transition group-hover:text-white">
-                    {contact.email}
-                  </span>
-                </a>
-              ))}
+                    <p className="mb-4 text-sm leading-relaxed text-gray-400">
+                      {contact.description}
+                    </p>
+
+                    <span className="break-all text-sm font-semibold text-[#29C3FF] transition group-hover:text-white">
+                      {contact.href
+                        ? contact.action
+                        : contact.email}
+                    </span>
+                  </>
+                );
+
+                if (contact.href) {
+                  return (
+                    <Link
+                      key={contact.label}
+                      href={contact.href}
+                      className={cardClassName}
+                    >
+                      {content}
+                    </Link>
+                  );
+                }
+
+                return (
+                  <a
+                    key={contact.email}
+                    href={`mailto:${contact.email}`}
+                    className={cardClassName}
+                  >
+                    {content}
+                  </a>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -801,17 +752,9 @@ export default function Home() {
               .map((review, index) => (
                 <motion.div
                   key={`${review.author}-${index}`}
-                  initial={{
-                    opacity: 0,
-                    y: 20,
-                  }}
-                  whileInView={{
-                    opacity: 1,
-                    y: 0,
-                  }}
-                  viewport={{
-                    once: true,
-                  }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
                   transition={{
                     duration: 0.4,
                     delay: index * 0.1,
@@ -840,9 +783,7 @@ export default function Home() {
 
                   <div className="mb-3 flex justify-center text-sm text-[#F59E0B]">
                     {"★".repeat(
-                      Math.round(
-                        getRating(review.rating)
-                      )
+                      Math.round(getRating(review.rating))
                     )}
                   </div>
 
@@ -871,9 +812,7 @@ export default function Home() {
 
             <div className="flex items-center gap-3">
               <button
-                onClick={() =>
-                  scrollInsider("left")
-                }
+                onClick={() => scrollInsider("left")}
                 aria-label="Scroll left"
                 className="flex h-11 w-11 items-center justify-center rounded-full border border-[#10B981]/30 bg-[#0d1117]/50 shadow-[0_0_18px_-8px_rgba(16,185,129,0.6)] transition hover:bg-[#10B981]/10"
               >
@@ -883,9 +822,7 @@ export default function Home() {
               </button>
 
               <button
-                onClick={() =>
-                  scrollInsider("right")
-                }
+                onClick={() => scrollInsider("right")}
                 aria-label="Scroll right"
                 className="flex h-11 w-11 items-center justify-center rounded-full border border-[#10B981]/30 bg-[#0d1117]/50 shadow-[0_0_18px_-8px_rgba(16,185,129,0.6)] transition hover:bg-[#10B981]/10"
               >
@@ -898,52 +835,41 @@ export default function Home() {
 
           <div className="relative -mx-6 md:-mx-20">
             <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-14 bg-gradient-to-r from-[#111827] via-[#111827] to-transparent" />
-
             <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-14 bg-gradient-to-l from-[#111827] via-[#111827] to-transparent" />
 
             <div
               ref={insiderScrollRef}
               className="dozers-insider-scroll flex gap-6 overflow-x-auto scroll-smooth px-6 pb-4 md:px-20"
             >
-              {INSIDER_POSTS.map(
-                (post, index) => (
-                  <motion.div
-                    key={post.href}
-                    initial={{
-                      opacity: 0,
-                      y: 14,
-                    }}
-                    whileInView={{
-                      opacity: 1,
-                      y: 0,
-                    }}
-                    viewport={{
-                      once: true,
-                    }}
-                    transition={{
-                      duration: 0.35,
-                      delay: index * 0.06,
-                    }}
-                    className="min-w-[280px] rounded-2xl border border-[#10B981]/20 bg-[#1a1f2a]/70 p-7 text-left shadow-[0_0_25px_-8px_rgba(16,185,129,0.45)] backdrop-blur-md transition-transform hover:scale-[1.02] sm:min-w-[340px] md:min-w-[380px]"
+              {INSIDER_POSTS.map((post, index) => (
+                <motion.div
+                  key={post.href}
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    duration: 0.35,
+                    delay: index * 0.06,
+                  }}
+                  className="min-w-[280px] rounded-2xl border border-[#10B981]/20 bg-[#1a1f2a]/70 p-7 text-left shadow-[0_0_25px_-8px_rgba(16,185,129,0.45)] backdrop-blur-md transition-transform hover:scale-[1.02] sm:min-w-[340px] md:min-w-[380px]"
+                >
+                  <h3 className="mb-2 text-xl font-semibold text-white">
+                    {post.title}
+                  </h3>
+
+                  <p className="mb-5 text-sm leading-relaxed text-gray-300">
+                    {post.desc}
+                  </p>
+
+                  <Link
+                    href={post.href}
+                    className="inline-flex items-center gap-2 font-semibold text-[#29C3FF] transition hover:text-[#F59E0B]"
                   >
-                    <h3 className="mb-2 text-xl font-semibold text-white">
-                      {post.title}
-                    </h3>
-
-                    <p className="mb-5 text-sm leading-relaxed text-gray-300">
-                      {post.desc}
-                    </p>
-
-                    <Link
-                      href={post.href}
-                      className="inline-flex items-center gap-2 font-semibold text-[#29C3FF] transition hover:text-[#F59E0B]"
-                    >
-                      Read more
-                      <span aria-hidden>→</span>
-                    </Link>
-                  </motion.div>
-                )
-              )}
+                    Read more
+                    <span aria-hidden>→</span>
+                  </Link>
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>

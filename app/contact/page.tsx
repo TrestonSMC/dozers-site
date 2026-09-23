@@ -4,7 +4,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-const CONTACT_EMAILS = [
+type ContactItem =
+  | {
+      label: string;
+      description: string;
+      email: string;
+      href?: never;
+      action?: never;
+    }
+  | {
+      label: string;
+      description: string;
+      href: string;
+      action: string;
+      email?: never;
+    };
+
+const CONTACT_ITEMS: ContactItem[] = [
   {
     label: "Events & Reservations",
     description:
@@ -15,7 +31,8 @@ const CONTACT_EMAILS = [
     label: "Employment Opportunities",
     description:
       "Interested in joining the Dozers Grill team?",
-    email: "staffing@dozersgrill.com",
+    href: "/careers",
+    action: "View Careers",
   },
   {
     label: "Bands & Entertainment",
@@ -120,32 +137,57 @@ export default function ContactPage() {
             </div>
           </section>
 
-          {/* Contact emails */}
+          {/* Contact options */}
           <section className="mb-10">
             <h2 className="mb-6 text-center font-[Playfair_Display] text-3xl text-white drop-shadow-[0_0_25px_rgba(41,195,255,0.5)]">
               Contact Us
             </h2>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {CONTACT_EMAILS.map((contact) => (
-                <a
-                  key={contact.email}
-                  href={`mailto:${contact.email}`}
-                  className="group rounded-xl border border-white/10 bg-white/5 p-5 text-center transition duration-300 hover:-translate-y-1 hover:border-[#29C3FF]/50 hover:bg-[#29C3FF]/10 hover:shadow-[0_0_20px_-5px_rgba(41,195,255,0.5)]"
-                >
-                  <h3 className="mb-2 text-lg font-semibold text-white">
-                    {contact.label}
-                  </h3>
+              {CONTACT_ITEMS.map((contact) => {
+                const cardClassName =
+                  "group rounded-xl border border-white/10 bg-white/5 p-5 text-center transition duration-300 hover:-translate-y-1 hover:border-[#29C3FF]/50 hover:bg-[#29C3FF]/10 hover:shadow-[0_0_20px_-5px_rgba(41,195,255,0.5)]";
 
-                  <p className="mb-3 text-sm leading-relaxed text-gray-400">
-                    {contact.description}
-                  </p>
+                const cardContent = (
+                  <>
+                    <h3 className="mb-2 text-lg font-semibold text-white">
+                      {contact.label}
+                    </h3>
 
-                  <p className="break-all text-sm font-medium text-[#29C3FF] transition group-hover:text-white">
-                    {contact.email}
-                  </p>
-                </a>
-              ))}
+                    <p className="mb-3 text-sm leading-relaxed text-gray-400">
+                      {contact.description}
+                    </p>
+
+                    <p className="break-all text-sm font-medium text-[#29C3FF] transition group-hover:text-white">
+                      {contact.href
+                        ? contact.action
+                        : contact.email}
+                    </p>
+                  </>
+                );
+
+                if (contact.href) {
+                  return (
+                    <Link
+                      key={contact.label}
+                      href={contact.href}
+                      className={cardClassName}
+                    >
+                      {cardContent}
+                    </Link>
+                  );
+                }
+
+                return (
+                  <a
+                    key={contact.email}
+                    href={`mailto:${contact.email}`}
+                    className={cardClassName}
+                  >
+                    {cardContent}
+                  </a>
+                );
+              })}
             </div>
 
             {/* Event submission */}
