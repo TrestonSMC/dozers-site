@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   BarChart3,
+  BriefcaseBusiness,
   ExternalLink,
   Images,
   LogOut,
@@ -24,6 +25,11 @@ const navigation = [
     name: "Gallery",
     href: "/admin/gallery",
     icon: Images,
+  },
+  {
+    name: "Job Postings",
+    href: "/admin/job-postings",
+    icon: BriefcaseBusiness,
   },
 ];
 

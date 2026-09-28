@@ -1,40 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { createClient } from "@/lib/supabase/client";
 
-const jobs = [
-  {
-    title: "Barback",
-    description:
-      "Help keep the bar stocked, organized, and running smoothly during every shift.",
-    link: "https://jobs.7shifts.com/62f61f95-273c-4665-a04b-849a99b06f80",
-    color: "#29C3FF",
-  },
-  {
-    title: "Line Cook / Prep Cook",
-    description:
-      "Prepare great food, maintain a clean station, and support a fast-moving kitchen team.",
-    link: "https://jobs.7shifts.com/b02a205b-ef82-4a16-b174-a04e262ad638",
-    color: "#F59E0B",
-  },
-  {
-    title: "Server",
-    description:
-      "Create a welcoming guest experience through attentive, friendly, and dependable service.",
-    link: "https://jobs.7shifts.com/e382ff70-a549-4bac-a926-23753237f434",
-    color: "#10B981",
-  },
-  {
-    title: "Bartender",
-    description:
-      "Serve quality drinks, connect with guests, and help create the energy that defines Dozers.",
-    link: "https://jobs.7shifts.com/f5ec69ce-87bb-4b6e-9e9c-d9736cd5aa59",
-    color: "#A855F7",
-  },
-];
+type JobPosting = {
+  id: string;
+  title: string;
+  description: string;
+  application_url: string;
+  color: string;
+  sort_order: number;
+};
 
 const fitItems = [
   "Show up ready to work",
@@ -69,6 +48,34 @@ const navigation = [
 
 export default function CareersPage() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [jobs, setJobs] = useState<JobPosting[]>([]);
+  const [loadingJobs, setLoadingJobs] = useState(true);
+
+  const supabase = useMemo(() => createClient(), []);
+
+  useEffect(() => {
+    async function loadJobs() {
+      const { data, error } = await supabase
+        .from("job_postings")
+        .select(
+          "id, title, description, application_url, color, sort_order"
+        )
+        .eq("is_visible", true)
+        .order("sort_order", { ascending: true });
+
+      if (error) {
+        console.error("Could not load job postings:", error);
+        setJobs([]);
+        setLoadingJobs(false);
+        return;
+      }
+
+      setJobs((data ?? []) as JobPosting[]);
+      setLoadingJobs(false);
+    }
+
+    void loadJobs();
+  }, [supabase]);
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#0d1117] text-gray-100">
@@ -393,46 +400,66 @@ export default function CareersPage() {
               </p>
             </div>
 
-            <div className="grid gap-8 md:grid-cols-2">
-              {jobs.map((job, index) => (
-                <motion.article
-                  key={job.title}
-                  initial={{ opacity: 0, y: 25 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.45, delay: index * 0.08 }}
-                  className="group rounded-2xl border bg-[#0d1117]/75 p-8 backdrop-blur-md transition hover:-translate-y-1"
-                  style={{
-                    borderColor: `${job.color}55`,
-                    boxShadow: `0 0 30px -12px ${job.color}`,
-                  }}
-                >
-                  <div
-                    className="mb-6 h-1 w-16 rounded-full"
-                    style={{ backgroundColor: job.color }}
-                  />
+            {loadingJobs ? (
+              <div className="py-12 text-center text-gray-400">
+                Loading open positions...
+              </div>
+            ) : jobs.length === 0 ? (
+              <div className="mx-auto max-w-2xl rounded-2xl border border-white/10 bg-[#0d1117]/75 p-10 text-center">
+                <h3 className="text-2xl font-semibold text-white">
+                  No Open Positions Right Now
+                </h3>
 
-                  <h3 className="mb-4 text-3xl font-semibold text-white">
-                    {job.title}
-                  </h3>
-
-                  <p className="mb-8 leading-relaxed text-gray-300">
-                    {job.description}
-                  </p>
-
-                  <a
-                    href={job.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full px-7 py-3 font-semibold text-[#0d1117] transition group-hover:scale-105"
-                    style={{ backgroundColor: job.color }}
+                <p className="mt-3 leading-relaxed text-gray-400">
+                  We don&apos;t currently have any positions listed, but check
+                  back soon for future opportunities at Dozers.
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-8 md:grid-cols-2">
+                {jobs.map((job, index) => (
+                  <motion.article
+                    key={job.id}
+                    initial={{ opacity: 0, y: 25 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{
+                      duration: 0.45,
+                      delay: index * 0.08,
+                    }}
+                    className="group rounded-2xl border bg-[#0d1117]/75 p-8 backdrop-blur-md transition hover:-translate-y-1"
+                    style={{
+                      borderColor: `${job.color}55`,
+                      boxShadow: `0 0 30px -12px ${job.color}`,
+                    }}
                   >
-                    Apply Through 7shifts
-                    <span aria-hidden="true">→</span>
-                  </a>
-                </motion.article>
-              ))}
-            </div>
+                    <div
+                      className="mb-6 h-1 w-16 rounded-full"
+                      style={{ backgroundColor: job.color }}
+                    />
+
+                    <h3 className="mb-4 text-3xl font-semibold text-white">
+                      {job.title}
+                    </h3>
+
+                    <p className="mb-8 leading-relaxed text-gray-300">
+                      {job.description}
+                    </p>
+
+                    <a
+                      href={job.application_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full px-7 py-3 font-semibold text-[#0d1117] transition group-hover:scale-105"
+                      style={{ backgroundColor: job.color }}
+                    >
+                      Apply Through 7shifts
+                      <span aria-hidden="true">→</span>
+                    </a>
+                  </motion.article>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
@@ -461,10 +488,14 @@ export default function CareersPage() {
               </p>
 
               <p className="mt-5 font-semibold text-white">Eric Sunman</p>
+
               <p className="text-sm text-gray-400">
                 Owner / General Manager
               </p>
-              <p className="text-sm text-gray-400">Dozers Grill</p>
+
+              <p className="text-sm text-gray-400">
+                Dozers Grill
+              </p>
             </div>
           </div>
         </section>
@@ -482,7 +513,9 @@ export default function CareersPage() {
               Privacy Policy
             </Link>
 
-            <span className="hidden text-gray-500 sm:block">|</span>
+            <span className="hidden text-gray-500 sm:block">
+              |
+            </span>
 
             <Link
               href="/sms-terms-and-conditions"
